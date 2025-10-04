@@ -27,9 +27,8 @@ const Navbar: React.FC<NavbarProps> = ({ onNewSession, onHistoryClick }) => {
   const handleNewSession = () => {
     if (onNewSession) {
       onNewSession();
-    } else {
-      window.location.reload();
     }
+    navigate('/dashboard');
   };
 
   const handleHistoryClick = () => {
