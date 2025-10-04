@@ -141,30 +141,33 @@ const DashboardLayout: React.FC = () => {
     <div className="container mx-auto p-6 max-w-7xl">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <h1 className="text-4xl font-bold text-base-content mb-2">Workspace</h1>
-            <p className="text-base-content/70">Transform your text with AI-powered tools</p>
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+          <div className="text-center lg:text-left">
+            <h1 className="text-4xl lg:text-5xl font-bold text-base-content mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              🎯 Workspace
+            </h1>
+            <p className="text-base-content/70 text-lg">Transform your text with AI-powered tools</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3 justify-center lg:justify-end">
             <button
               onClick={() => setShowBrowserInfo(!showBrowserInfo)}
-              className="btn btn-ghost btn-sm"
-              title="Browser compatibility info"
+              className="btn btn-ghost btn-sm tooltip tooltip-bottom"
+              data-tip="Browser compatibility info"
             >
               <span className="text-lg">ℹ️</span>
             </button>
             <button
               onClick={() => setShowHistory(true)}
-              className="btn btn-outline btn-sm"
+              className="btn btn-outline btn-sm shadow-md hover:shadow-lg transition-all duration-200"
             >
               <span className="text-lg mr-2">🕒</span>
               History
             </button>
             <button 
               onClick={clearAll} 
-              className="btn btn-outline btn-sm"
+              className="btn btn-outline btn-sm shadow-md hover:shadow-lg transition-all duration-200"
             >
+              <span className="text-lg mr-2">🗑️</span>
               Clear All
             </button>
           </div>
@@ -218,15 +221,18 @@ const DashboardLayout: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Input Pane */}
         <div className="space-y-6">
-          <div className="card bg-base-200 shadow-lg">
-            <div className="card-body">
+          <div className="card bg-base-100 shadow-xl border border-base-300">
+            <div className="card-body p-6">
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text font-semibold text-lg">Input Text</span>
-                  <div className="badge badge-primary badge-sm">Required</div>
+                  <span className="label-text font-semibold text-xl flex items-center gap-2">
+                    <span className="text-2xl">📝</span>
+                    Input Text
+                  </span>
+                  <div className="badge badge-primary badge-lg">Required</div>
                 </label>
                 <textarea
-                  className="textarea textarea-bordered w-full h-80 resize-none text-base"
+                  className="textarea textarea-bordered w-full h-80 resize-none text-base focus:textarea-primary shadow-inner"
                   placeholder="Enter your text here or use voice input..."
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
@@ -242,12 +248,15 @@ const DashboardLayout: React.FC = () => {
           </div>
 
           {/* Voice Input */}
-          <div className="card bg-base-200 shadow-lg">
-            <div className="card-body">
+          <div className="card bg-base-100 shadow-xl border border-base-300">
+            <div className="card-body p-6">
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text font-semibold">Voice Input</span>
-                  <div className="badge badge-secondary badge-sm">Optional</div>
+                  <span className="label-text font-semibold text-xl flex items-center gap-2">
+                    <span className="text-2xl">🎤</span>
+                    Voice Input
+                  </span>
+                  <div className="badge badge-secondary badge-lg">Optional</div>
                 </label>
                 {speechSupported ? (
                   <div className="space-y-4">
@@ -309,15 +318,18 @@ const DashboardLayout: React.FC = () => {
 
         {/* Output Pane */}
         <div className="space-y-6">
-          <div className="card bg-base-200 shadow-lg">
-            <div className="card-body">
+          <div className="card bg-base-100 shadow-xl border border-base-300">
+            <div className="card-body p-6">
               <div className="form-control">
                 <div className="label">
-                  <span className="label-text font-semibold text-lg">Output</span>
+                  <span className="label-text font-semibold text-xl flex items-center gap-2">
+                    <span className="text-2xl">✨</span>
+                    Output
+                  </span>
                   {outputText && (
                     <button
                       onClick={copyOutput}
-                      className={`btn btn-sm ${copySuccess ? 'btn-success' : 'btn-outline'}`}
+                      className={`btn btn-sm shadow-md hover:shadow-lg transition-all duration-200 ${copySuccess ? 'btn-success' : 'btn-outline'}`}
                     >
                       {copySuccess ? '✓ Copied!' : '📋 Copy'}
                     </button>
@@ -386,68 +398,89 @@ const DashboardLayout: React.FC = () => {
         </div>
       </div>
 
-      {/* Action Buttons */}
+      {/* Action Toolbar */}
       <motion.div 
-        className="mt-12 flex flex-wrap gap-6 justify-center"
+        className="mt-12"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <motion.button
-          onClick={() => handleAction('summarize')}
-          className={`btn btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-40 ${
-            activeAction === 'summarize' 
-              ? 'btn-primary loading scale-105' 
-              : 'btn-primary hover:scale-105'
-          }`}
-          disabled={!inputText.trim() || isProcessing}
-          whileHover={{ scale: activeAction !== 'summarize' ? 1.05 : 1 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          {activeAction === 'summarize' ? '' : '📝 Summarize'}
-        </motion.button>
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold text-base-content mb-2">AI Actions</h2>
+          <p className="text-base-content/70">Choose an action to process your text</p>
+        </div>
         
-        <motion.button
-          onClick={() => handleAction('clean')}
-          className={`btn btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-40 ${
-            activeAction === 'clean' 
-              ? 'btn-secondary loading scale-105' 
-              : 'btn-secondary hover:scale-105'
-          }`}
-          disabled={!inputText.trim() || isProcessing}
-          whileHover={{ scale: activeAction !== 'clean' ? 1.05 : 1 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          {activeAction === 'clean' ? '' : '✨ Clean'}
-        </motion.button>
-        
-        <motion.button
-          onClick={() => handleAction('tasks')}
-          className={`btn btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-40 ${
-            activeAction === 'tasks' 
-              ? 'btn-accent loading scale-105' 
-              : 'btn-accent hover:scale-105'
-          }`}
-          disabled={!inputText.trim() || isProcessing}
-          whileHover={{ scale: activeAction !== 'tasks' ? 1.05 : 1 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          {activeAction === 'tasks' ? '' : '✅ Extract Tasks'}
-        </motion.button>
-        
-        <motion.button
-          onClick={() => handleAction('translate')}
-          className={`btn btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-40 ${
-            activeAction === 'translate' 
-              ? 'btn-info loading scale-105' 
-              : 'btn-info hover:scale-105'
-          }`}
-          disabled={!inputText.trim() || isProcessing}
-          whileHover={{ scale: activeAction !== 'translate' ? 1.05 : 1 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          {activeAction === 'translate' ? '' : '🌍 Translate'}
-        </motion.button>
+        <div className="flex flex-wrap gap-4 justify-center">
+          <motion.button
+            onClick={() => handleAction('summarize')}
+            className={`btn btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-48 ${
+              activeAction === 'summarize' 
+                ? 'btn-primary loading scale-105' 
+                : 'btn-primary hover:scale-105'
+            }`}
+            disabled={!inputText.trim() || isProcessing}
+            whileHover={{ scale: activeAction !== 'summarize' ? 1.05 : 1 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {activeAction === 'summarize' ? '' : '📝 Summarize'}
+          </motion.button>
+          
+          <motion.button
+            onClick={() => handleAction('clean')}
+            className={`btn btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-48 ${
+              activeAction === 'clean' 
+                ? 'btn-secondary loading scale-105' 
+                : 'btn-secondary hover:scale-105'
+            }`}
+            disabled={!inputText.trim() || isProcessing}
+            whileHover={{ scale: activeAction !== 'clean' ? 1.05 : 1 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {activeAction === 'clean' ? '' : '✨ Clean'}
+          </motion.button>
+          
+          <motion.button
+            onClick={() => handleAction('tasks')}
+            className={`btn btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-48 ${
+              activeAction === 'tasks' 
+                ? 'btn-accent loading scale-105' 
+                : 'btn-accent hover:scale-105'
+            }`}
+            disabled={!inputText.trim() || isProcessing}
+            whileHover={{ scale: activeAction !== 'tasks' ? 1.05 : 1 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {activeAction === 'tasks' ? '' : '✅ Extract Tasks'}
+          </motion.button>
+          
+          <motion.button
+            onClick={() => handleAction('translate')}
+            className={`btn btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-48 ${
+              activeAction === 'translate' 
+                ? 'btn-info loading scale-105' 
+                : 'btn-info hover:scale-105'
+            }`}
+            disabled={!inputText.trim() || isProcessing}
+            whileHover={{ scale: activeAction !== 'translate' ? 1.05 : 1 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {activeAction === 'translate' ? '' : '🌍 Translate'}
+          </motion.button>
+          
+          <motion.button
+            onClick={toggleVoiceInput}
+            className={`btn btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-48 ${
+              listening 
+                ? 'btn-error loading scale-105' 
+                : 'btn-warning hover:scale-105'
+            }`}
+            disabled={isProcessing}
+            whileHover={{ scale: listening ? 1 : 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {listening ? '' : '🎤 Mic'}
+          </motion.button>
+        </div>
       </motion.div>
 
       {/* History Panel */}

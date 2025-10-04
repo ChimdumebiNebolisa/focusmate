@@ -4,9 +4,9 @@ import DashboardLayout from '../components/DashboardLayout';
 
 const Dashboard: React.FC = () => {
   return (
-    <div className="min-h-screen bg-base-100">
+    <div className="min-h-screen bg-base-200">
       <Navbar />
-      <main>
+      <main className="pt-4">
         <DashboardLayout />
       </main>
     </div>
