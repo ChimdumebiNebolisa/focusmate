@@ -279,57 +279,57 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex flex-wrap gap-4 mt-6 justify-center"
+            className="mt-6"
           >
-            {actions.map(({ label, icon: Icon, action, color, tooltip }) => (
-              <div key={action} className="relative group">
-                <motion.button
-                  onClick={() => handleAction(action)}
-                  className={`px-5 py-2 rounded-lg shadow-md hover:shadow-xl transition-all duration-200 flex items-center gap-2 bg-gradient-to-r ${color} text-white font-semibold ${
-                    activeAction === action 
-                      ? 'scale-105 opacity-75' 
-                      : ''
-                  }`}
-                  disabled={!inputText.trim() || isProcessing}
-                  whileHover={{ scale: activeAction !== action ? 1.05 : 1, filter: "brightness(1.2)" }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {activeAction === action ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  ) : (
-                    <>
-                      <Icon size={20} />
-                      <span className="text-sm font-medium">{label}</span>
-                    </>
-                  )}
-                </motion.button>
-                <span className="absolute -top-8 left-1/2 -translate-x-1/2 text-xs bg-gray-800 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-50">
-                  {tooltip}
-                </span>
+            <div className="flex flex-wrap gap-3 justify-center items-end">
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-3 justify-center">
+                {actions.map(({ label, icon: Icon, action, color, tooltip }) => (
+                  <div key={action} className="relative group">
+                    <motion.button
+                      onClick={() => handleAction(action)}
+                      className={`px-4 py-2 rounded-lg shadow-md hover:shadow-xl transition-all duration-200 flex items-center gap-2 bg-gradient-to-r ${color} text-white font-semibold ${
+                        activeAction === action 
+                          ? 'scale-105 opacity-75' 
+                          : ''
+                      }`}
+                      disabled={!inputText.trim() || isProcessing}
+                      whileHover={{ scale: activeAction !== action ? 1.05 : 1, filter: "brightness(1.2)" }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      {activeAction === action ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <>
+                          <Icon size={18} />
+                          <span className="text-sm font-medium">{label}</span>
+                        </>
+                      )}
+                    </motion.button>
+                    <span className="absolute -top-10 left-1/2 -translate-x-1/2 text-xs bg-gray-800 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-50">
+                      {tooltip}
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </motion.div>
 
-          {/* Translation Mode Selector */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="mt-4"
-          >
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Translation Mode
-            </label>
-            <select 
-              value={translationMode}
-              onChange={(e) => setTranslationMode(e.target.value)}
-              className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-            >
-              <option value="academic">Academic</option>
-              <option value="concise">Concise</option>
-              <option value="creative">Creative</option>
-              <option value="conversational">Conversational</option>
-            </select>
+              {/* Translation Mode Selector */}
+              <div className="flex flex-col items-center">
+                <label className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Translation Mode
+                </label>
+                <select 
+                  value={translationMode}
+                  onChange={(e) => setTranslationMode(e.target.value)}
+                  className="border border-gray-300 dark:border-gray-600 rounded-md px-2 py-1 text-xs focus:ring-2 focus:ring-indigo-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                >
+                  <option value="academic">Academic</option>
+                  <option value="concise">Concise</option>
+                  <option value="creative">Creative</option>
+                  <option value="conversational">Conversational</option>
+                </select>
+              </div>
+            </div>
           </motion.div>
         </motion.div>
 
