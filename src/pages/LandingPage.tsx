@@ -3,12 +3,12 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const LandingPage: React.FC = () => {
-  const { user, login, loading } = useAuth();
+  const { user, loginWithGoogle, loading } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
-      await login();
+      await loginWithGoogle();
       navigate('/app');
     } catch (error) {
       console.error('Login failed:', error);

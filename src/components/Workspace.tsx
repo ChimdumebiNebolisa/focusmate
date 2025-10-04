@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import VoiceMode from './VoiceMode';
-import { summarize, rewrite, extractTasks, translate } from '../utils/ai';
+import { summarizeText, rewriteText, extractTasks, translateText } from '../utils/chromeAI';
 
 const Workspace: React.FC = () => {
   const [inputText, setInputText] = useState('');
@@ -22,16 +22,16 @@ const Workspace: React.FC = () => {
       
       switch (action) {
         case 'summarize':
-          result = await summarize(inputText);
+          result = await summarizeText(inputText);
           break;
         case 'rewrite':
-          result = await rewrite(inputText);
+          result = await rewriteText(inputText);
           break;
         case 'extractTasks':
           result = await extractTasks(inputText);
           break;
         case 'translate':
-          result = await translate(inputText, 'es');
+          result = await translateText(inputText, 'es');
           break;
         default:
           result = 'Action not implemented';
