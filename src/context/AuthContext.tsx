@@ -36,12 +36,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
+    console.log("AuthContext: Setting up auth state listener");
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       console.log("Auth state changed:", currentUser);
+      console.log("Auth state changed - user details:", currentUser ? {
+        uid: currentUser.uid,
+        email: currentUser.email,
+        displayName: currentUser.displayName
+      } : null);
       setUser(currentUser);
       setLoading(false);
     });
-    return () => unsubscribe();
+    return () => {
+      console.log("AuthContext: Cleaning up auth state listener");
+      unsubscribe();
+    };
   }, []);
 
   return (

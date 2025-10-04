@@ -1,11 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { initSpeechRecognition } from '../utils/speech';
 
 const VoiceMode: React.FC = () => {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [isSupported, setIsSupported] = useState(true);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
 
   const startListening = () => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -14,24 +13,33 @@ const VoiceMode: React.FC = () => {
     }
 
     try {
-      recognitionRef.current = initSpeechRecognition((text: string) => {
-        setTranscript(prev => prev + ' ' + text);
-      });
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
 
-      recognitionRef.current.onstart = () => {
+      recognition.onstart = () => {
         setIsListening(true);
       };
 
-      recognitionRef.current.onend = () => {
+      recognition.onend = () => {
         setIsListening(false);
       };
 
-      recognitionRef.current.onerror = (event: Event) => {
+      recognition.onresult = (event: any) => {
+        const result = event.results[event.results.length - 1][0].transcript;
+        setTranscript(prev => prev + ' ' + result);
+      };
+
+      recognition.onerror = (event: any) => {
         console.error('Speech recognition error:', event.error);
         setIsListening(false);
       };
 
-      recognitionRef.current.start();
+      recognitionRef.current = recognition;
+      recognition.start();
     } catch (error) {
       console.error('Failed to start speech recognition:', error);
       setIsSupported(false);

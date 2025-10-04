@@ -25,12 +25,6 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (isOpen && user) {
-      loadHistory();
-    }
-  }, [isOpen, user, loadHistory]);
-
   const loadHistory = useCallback(async () => {
     if (!user) return;
     
@@ -47,6 +41,12 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
       setLoading(false);
     }
   }, [user]);
+
+  useEffect(() => {
+    if (isOpen && user) {
+      loadHistory();
+    }
+  }, [isOpen, user, loadHistory]);
 
   const handleDeleteSession = async (sessionId: string) => {
     if (!user) return;
