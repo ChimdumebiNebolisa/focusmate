@@ -202,3 +202,4 @@ export async function safeChromeAICall<T>(
     return 'Chrome AI operation failed. Please try again.';
   }
 }
+
