@@ -22,11 +22,13 @@ const Dashboard: React.FC = () => {
         onNewSession={handleNewSession}
         onHistoryClick={handleHistoryClick}
       />
-      <main>
-        <DashboardLayout 
-          showHistory={showHistory}
-          onCloseHistory={() => setShowHistory(false)}
-        />
+      <main className="pt-20 pb-20">
+        <div className="max-w-6xl mx-auto px-6 space-y-10">
+          <DashboardLayout 
+            showHistory={showHistory}
+            onCloseHistory={() => setShowHistory(false)}
+          />
+        </div>
       </main>
       <Footer />
     </div>

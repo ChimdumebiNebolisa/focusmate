@@ -4,6 +4,7 @@ const VoiceMode: React.FC = () => {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [isSupported, setIsSupported] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
 
   const startListening = () => {
@@ -28,11 +29,13 @@ const VoiceMode: React.FC = () => {
         setIsListening(false);
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       recognition.onresult = (event: any) => {
         const result = event.results[event.results.length - 1][0].transcript;
         setTranscript(prev => prev + ' ' + result);
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       recognition.onerror = (event: any) => {
         console.error('Speech recognition error:', event.error);
         setIsListening(false);

@@ -150,7 +150,7 @@ export async function extractTasks(input: string): Promise<string> {
 /**
  * Translates the input text using Chrome AI
  */
-export async function translateText(input: string, targetLang: string = "en"): Promise<string> {
+export async function translateText(input: string, targetLang: string = "en", mode: string = "academic"): Promise<string> {
   try {
     if (!input.trim()) {
       return "Please provide text to translate.";
@@ -160,9 +160,19 @@ export async function translateText(input: string, targetLang: string = "en"): P
       return "🔧 Chrome AI API not supported on this browser.\n\nTo use AI features:\n• Use Chrome browser (latest version)\n• Enable Chrome AI features in settings\n• Ensure you're on a supported platform";
     }
 
+    // Create context based on translation mode
+    const modeContexts = {
+      academic: "Translate this text in an academic, formal style suitable for scholarly writing.",
+      concise: "Translate this text in a concise, clear manner while preserving key information.",
+      creative: "Translate this text with creative flair, maintaining the original's artistic expression.",
+      conversational: "Translate this text in a natural, conversational tone as if speaking to a friend."
+    };
+
+    const context = modeContexts[mode as keyof typeof modeContexts] || modeContexts.academic;
+
     const translator = await window.ai.translator.create();
     const result = await translator.run({ 
-      text: input, 
+      text: `${context}\n\nText to translate: ${input}`, 
       targetLanguage: targetLang 
     });
     

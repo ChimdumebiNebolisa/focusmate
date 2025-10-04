@@ -16,9 +16,6 @@ const LandingHero: React.FC = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* Base gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500" />
-      
       {/* Particle network background */}
       <ParticleBackground />
       
@@ -50,7 +47,7 @@ const LandingHero: React.FC = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-5xl md:text-6xl font-extrabold tracking-tight drop-shadow-md text-white mb-8"
+            className="text-4xl md:text-5xl font-bold tracking-tight drop-shadow-md text-white mb-8"
           >
             Organize your thoughts... instantly.
           </motion.h1>
@@ -60,7 +57,7 @@ const LandingHero: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="text-lg md:text-xl lg:text-2xl mb-12 opacity-90 max-w-4xl mx-auto leading-relaxed"
+            className="text-lg text-white/90 mb-12 opacity-90 max-w-4xl mx-auto leading-relaxed"
             style={{
               textShadow: '0 2px 10px rgba(0,0,0,0.3)'
             }}
@@ -82,6 +79,7 @@ const LandingHero: React.FC = () => {
               <GoogleButton />
             </div>
           </motion.div>
+          
           
           {/* Decorative elements */}
           <motion.div

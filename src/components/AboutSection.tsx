@@ -25,8 +25,8 @@ const AboutSection: React.FC = () => {
   ];
 
   return (
-    <section id="about-section" className="py-20 bg-white dark:bg-gray-900">
-      <div className="container mx-auto px-4 max-w-6xl">
+    <section id="about-section" className="py-24 bg-white dark:bg-gray-900">
+      <div className="container mx-auto px-6 max-w-6xl">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -34,10 +34,10 @@ const AboutSection: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-800 dark:text-white">
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6 text-gray-800 dark:text-white">
             What FocusMate Does
           </h2>
-          <p className="text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             Transform your thoughts into organized, actionable content with AI-powered tools
           </p>
         </motion.div>
@@ -53,7 +53,7 @@ const AboutSection: React.FC = () => {
               whileHover={{ scale: 1.05, y: -8 }}
               className="group"
             >
-              <div className="bg-gray-100 dark:bg-gray-800 shadow-xl hover:shadow-2xl transition-all duration-300 p-8 h-full border border-gray-200 dark:border-gray-700 rounded-2xl">
+              <div className="rounded-2xl shadow-lg hover:shadow-xl transition-all bg-white text-gray-800 p-8 md:p-10 h-full border border-gray-200 dark:border-gray-700">
                 <div className="flex flex-col items-center text-center h-full">
                   <motion.div
                     whileHover={{ rotate: 360 }}
@@ -82,7 +82,7 @@ const AboutSection: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
           viewport={{ once: true }}
-          className="text-center mt-16"
+          className="text-center my-16"
         >
           <h3 className="text-2xl md:text-3xl font-bold mb-4 text-gray-800 dark:text-white">
             Ready to focus smarter?

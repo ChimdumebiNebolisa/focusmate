@@ -20,28 +20,28 @@ const actions = [
     icon: Brain, 
     action: 'summarize' as ActionType, 
     color: 'from-indigo-500 to-purple-600',
-    tooltip: 'Generate a clean summary of your text.'
+    tooltip: 'Condense text while keeping the core meaning.'
   },
   { 
     label: 'Clean', 
     icon: Sparkles, 
     action: 'clean' as ActionType, 
     color: 'from-emerald-500 to-teal-600',
-    tooltip: 'Fix grammar, tone, and readability.'
+    tooltip: 'Polish grammar, tone, and structure.'
   },
   { 
     label: 'Extract Tasks', 
     icon: CheckSquare, 
     action: 'tasks' as ActionType, 
     color: 'from-orange-500 to-red-600',
-    tooltip: 'Identify actionable items from your notes.'
+    tooltip: 'Identify key actions and to-dos.'
   },
   { 
     label: 'Translate', 
     icon: Globe, 
     action: 'translate' as ActionType, 
     color: 'from-blue-500 to-cyan-600',
-    tooltip: 'Translate your text to another language.'
+    tooltip: 'Convert text between languages with style options.'
   },
 ];
 
@@ -60,6 +60,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
   const [copySuccess, setCopySuccess] = useState(false);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [translationMode, setTranslationMode] = useState('academic');
 
   const {
     transcript,
@@ -104,7 +105,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
           result = await extractTasks(inputText);
           break;
         case 'translate':
-          result = await translateText(inputText, 'en');
+          result = await translateText(inputText, 'en', translationMode);
           break;
       }
       
@@ -166,7 +167,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
   };
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen pt-16 px-8">
+    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
       {/* Header */}
       <motion.div 
         className="text-center mb-12"
@@ -174,16 +175,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 dark:text-white mb-4">
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-800 dark:text-white mb-4">
           What's on your mind today?
         </h1>
-        <p className="text-gray-500 dark:text-gray-300 text-lg md:text-xl max-w-3xl mx-auto mb-10">
+        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-10">
           Let FocusMate help you summarize, clean, or translate your thoughts.
         </p>
       </motion.div>
 
       {/* Two Column Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
 
 
         {/* Left Panel - Input */}
@@ -281,7 +282,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
             className="flex flex-wrap gap-4 mt-6 justify-center"
           >
             {actions.map(({ label, icon: Icon, action, color, tooltip }) => (
-              <div key={action} title={tooltip}>
+              <div key={action} className="relative group">
                 <motion.button
                   onClick={() => handleAction(action)}
                   className={`px-5 py-2 rounded-lg shadow-md hover:shadow-xl transition-all duration-200 flex items-center gap-2 bg-gradient-to-r ${color} text-white font-semibold ${
@@ -302,8 +303,33 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
                     </>
                   )}
                 </motion.button>
+                <span className="absolute -top-8 left-1/2 -translate-x-1/2 text-xs bg-gray-800 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-50">
+                  {tooltip}
+                </span>
               </div>
             ))}
+          </motion.div>
+
+          {/* Translation Mode Selector */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="mt-4"
+          >
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Translation Mode
+            </label>
+            <select 
+              value={translationMode}
+              onChange={(e) => setTranslationMode(e.target.value)}
+              className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            >
+              <option value="academic">Academic</option>
+              <option value="concise">Concise</option>
+              <option value="creative">Creative</option>
+              <option value="conversational">Conversational</option>
+            </select>
           </motion.div>
         </motion.div>
 
