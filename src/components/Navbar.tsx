@@ -90,9 +90,10 @@ const Navbar: React.FC<NavbarProps> = ({ onNewSession, onHistoryClick }) => {
 
         {/* Logo */}
         <motion.div 
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 cursor-pointer"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          onClick={() => navigate('/dashboard')}
         >
           <motion.div
             className="relative"

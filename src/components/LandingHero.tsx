@@ -107,7 +107,7 @@ const LandingHero: React.FC = () => {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={scrollToAbout}
-        className="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2 z-20 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-2 md:px-6 md:py-3 text-white hover:bg-white/20 transition-all duration-300 group"
+        className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-20 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-2 md:px-6 md:py-3 text-white hover:bg-white/20 transition-all duration-300 group"
         style={{
           textShadow: '0 2px 10px rgba(0,0,0,0.3)'
         }}
