@@ -19,8 +19,8 @@ const Navbar: React.FC = () => {
   };
 
   const handleNewSession = () => {
-    // No-op for now
-    console.log('New session clicked');
+    // Reset the workspace for a new session
+    window.location.reload();
   };
 
   return (
@@ -89,13 +89,19 @@ const Navbar: React.FC = () => {
       <div className="navbar-end">
         {/* Theme Toggle */}
         <div className="mr-4">
-          <input
-            type="checkbox"
-            className="toggle toggle-primary"
-            onChange={() =>
-              document.documentElement.classList.toggle("dark")
-            }
-          />
+          <button
+            className="btn btn-ghost btn-circle"
+            onClick={() => {
+              const currentTheme = document.documentElement.getAttribute('data-theme');
+              const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+              document.documentElement.setAttribute('data-theme', newTheme);
+            }}
+            title="Toggle theme"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+          </button>
         </div>
         <div className="dropdown dropdown-end">
           <div

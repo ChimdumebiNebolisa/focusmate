@@ -102,7 +102,7 @@ const DashboardLayout: React.FC = () => {
             action: type,
             processingTime
           });
-          console.log(`✅ Session saved in ${processingTime}ms`);
+          // Session saved successfully
         } catch (error) {
           console.error('Failed to save session:', error);
         }
@@ -146,7 +146,7 @@ const DashboardLayout: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 max-w-7xl">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
       {/* Header */}
       <motion.div 
         className="mb-8"
@@ -154,14 +154,16 @@ const DashboardLayout: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-6">
           <div className="text-center lg:text-left">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-base-content mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-base-content mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               🎯 Workspace
             </h1>
-            <p className="text-base-content/70 text-base sm:text-lg">Transform your text with AI-powered tools</p>
+            <p className="text-base-content/70 text-lg sm:text-xl max-w-2xl">
+              Transform your thoughts into organized, actionable content with AI-powered tools
+            </p>
           </div>
-          <div className="flex flex-wrap gap-2 sm:gap-3 justify-center lg:justify-end">
+          <div className="flex flex-wrap gap-3 justify-center lg:justify-end">
             <button
               onClick={() => setShowBrowserInfo(!showBrowserInfo)}
               className="btn btn-ghost btn-sm tooltip tooltip-bottom"
@@ -171,14 +173,14 @@ const DashboardLayout: React.FC = () => {
             </button>
             <button
               onClick={() => setShowHistory(true)}
-              className="btn btn-outline btn-sm shadow-md hover:shadow-lg transition-all duration-200"
+              className="btn btn-outline btn-sm shadow-lg hover:shadow-xl transition-all duration-200"
             >
               <span className="text-lg mr-2">🕒</span>
               History
             </button>
             <button 
               onClick={clearAll} 
-              className="btn btn-outline btn-sm shadow-md hover:shadow-lg transition-all duration-200"
+              className="btn btn-outline btn-sm shadow-lg hover:shadow-xl transition-all duration-200"
             >
               <span className="text-lg mr-2">🗑️</span>
               Clear All
@@ -231,26 +233,26 @@ const DashboardLayout: React.FC = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         {/* Input Pane */}
         <div className="space-y-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="card bg-base-100 shadow-xl border border-base-300 hover:shadow-2xl transition-shadow duration-300"
+            className="card bg-base-200 shadow-xl border border-base-300 hover:shadow-2xl transition-shadow duration-300"
           >
             <div className="card-body p-6">
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text font-semibold text-xl flex items-center gap-2">
+                  <span className="label-text font-semibold text-xl flex items-center gap-3">
                     <span className="text-2xl">📝</span>
                     Input Text
                   </span>
                   <div className="badge badge-primary badge-lg">Required</div>
                 </label>
                 <textarea
-                  className="textarea textarea-bordered w-full h-80 resize-none text-base focus:textarea-primary shadow-inner hover:shadow-md transition-shadow duration-200"
+                  className="textarea textarea-bordered w-full h-80 resize-none text-base focus:textarea-primary shadow-inner hover:shadow-md transition-shadow duration-200 bg-base-100"
                   placeholder="Enter your text here or use voice input..."
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
@@ -270,7 +272,7 @@ const DashboardLayout: React.FC = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="card bg-base-100 shadow-xl border border-base-300 hover:shadow-2xl transition-shadow duration-300"
+            className="card bg-base-200 shadow-xl border border-base-300 hover:shadow-2xl transition-shadow duration-300"
           >
             <div className="card-body p-6">
               <div className="form-control">
@@ -336,7 +338,7 @@ const DashboardLayout: React.FC = () => {
                 )}
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Output Pane */}
@@ -345,7 +347,7 @@ const DashboardLayout: React.FC = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
-            className="card bg-base-100 shadow-xl border border-base-300 hover:shadow-2xl transition-shadow duration-300"
+            className="card bg-base-200 shadow-xl border border-base-300 hover:shadow-2xl transition-shadow duration-300"
           >
             <div className="card-body p-6">
               <div className="form-control">
@@ -422,28 +424,30 @@ const DashboardLayout: React.FC = () => {
                 </motion.div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 
       {/* Action Toolbar */}
       <motion.div 
-        className="mt-12"
+        className="mt-16"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <div className="text-center mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-base-content mb-2">AI Actions</h2>
-          <p className="text-base-content/70 text-sm sm:text-base">Choose an action to process your text</p>
+        <div className="text-center mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-base-content mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            AI Actions
+          </h2>
+          <p className="text-base-content/70 text-base sm:text-lg">Choose an action to process your text with Chrome AI</p>
         </div>
         
-        <div className="flex flex-wrap gap-3 sm:gap-4 justify-center">
+        <div className="flex flex-wrap gap-4 sm:gap-6 justify-center max-w-4xl mx-auto">
           {actions.map(({ label, icon: Icon, action, color }) => (
             <motion.button
               key={action}
               onClick={() => handleAction(action)}
-              className={`btn btn-sm sm:btn-md lg:btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-36 sm:min-w-44 lg:min-w-48 flex items-center gap-2 sm:gap-3 ${
+              className={`btn btn-lg shadow-xl hover:shadow-2xl transition-all duration-200 min-w-40 sm:min-w-48 lg:min-w-52 flex items-center gap-3 ${
                 activeAction === action 
                   ? `${color} loading scale-105` 
                   : `${color} hover:scale-105`
@@ -456,8 +460,8 @@ const DashboardLayout: React.FC = () => {
                 <div className="loading loading-spinner loading-sm"></div>
               ) : (
               <>
-                <Icon size={16} className="sm:w-5 sm:h-5" />
-                <span className="text-xs sm:text-sm lg:text-base">{label}</span>
+                <Icon size={20} />
+                <span className="text-sm font-medium">{label}</span>
               </>
               )}
             </motion.button>
@@ -465,7 +469,7 @@ const DashboardLayout: React.FC = () => {
           
           <motion.button
             onClick={toggleVoiceInput}
-            className={`btn btn-sm sm:btn-md lg:btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-36 sm:min-w-44 lg:min-w-48 flex items-center gap-2 sm:gap-3 ${
+            className={`btn btn-lg shadow-xl hover:shadow-2xl transition-all duration-200 min-w-40 sm:min-w-48 lg:min-w-52 flex items-center gap-3 ${
               listening 
                 ? 'btn-error loading scale-105' 
                 : 'btn-warning hover:scale-105'
@@ -478,8 +482,8 @@ const DashboardLayout: React.FC = () => {
               <div className="loading loading-spinner loading-sm"></div>
             ) : (
               <>
-                <Mic size={16} className="sm:w-5 sm:h-5" />
-                <span className="text-xs sm:text-sm lg:text-base">Voice Input</span>
+                <Mic size={20} />
+                <span className="text-sm font-medium">Voice Input</span>
               </>
             )}
           </motion.button>
