@@ -17,6 +17,10 @@ const Navbar: React.FC<NavbarProps> = ({ onNewSession, onHistoryClick }) => {
 
   const handleLogout = async () => {
     try {
+      // Switch to light mode before logout
+      document.documentElement.classList.remove('dark');
+      setIsDark(false);
+      
       await logout();
       navigate('/');
     } catch (error) {

@@ -20,6 +20,18 @@ const Settings: React.FC = () => {
     alert('Cache cleared successfully!');
   };
 
+  const handleLogout = async () => {
+    try {
+      // Switch to light mode before logout
+      document.documentElement.classList.remove('dark');
+      setIsDarkMode(false);
+      
+      await logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-all duration-500">
@@ -95,7 +107,7 @@ const Settings: React.FC = () => {
                     <p className="text-sm text-gray-500 dark:text-gray-400">Sign out of your account</p>
                   </div>
                   <button
-                    onClick={logout}
+                    onClick={handleLogout}
                     className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-all duration-200 flex items-center gap-2"
                   >
                     <LogOut className="w-4 h-4" />
