@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Menu, LogOut, Settings } from 'lucide-react';
+import { Menu, LogOut, Settings, Zap } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
@@ -53,10 +54,26 @@ const Navbar: React.FC = () => {
             </li>
           </ul>
         </div>
-        <a className="btn btn-ghost text-xl font-bold text-white hover:bg-white/20">
-          <span className="mr-2">🎯</span>
-          FocusMate
-        </a>
+        <motion.a 
+          className="btn btn-ghost text-xl font-bold text-white hover:bg-white/20 flex items-center gap-2"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <motion.div
+            animate={{ 
+              rotate: [0, 10, -10, 0],
+              scale: [1, 1.1, 1]
+            }}
+            transition={{ 
+              duration: 2,
+              repeat: Infinity,
+              repeatDelay: 3
+            }}
+          >
+            <Zap size={24} className="text-yellow-300" />
+          </motion.div>
+          <span>FocusMate</span>
+        </motion.a>
       </div>
 
       <div className="navbar-center hidden lg:flex">

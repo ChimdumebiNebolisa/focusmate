@@ -11,8 +11,16 @@ import {
 } from '../utils/chromeAI';
 import { saveSession } from '../services/historyService';
 import HistoryPanel from './HistoryPanel';
+import { FileText, Eraser, ListTodo, Languages, Mic } from 'lucide-react';
 
 type ActionType = 'summarize' | 'clean' | 'tasks' | 'translate';
+
+const actions = [
+  { label: 'Summarize', icon: FileText, action: 'summarize' as ActionType, color: 'btn-primary' },
+  { label: 'Clean', icon: Eraser, action: 'clean' as ActionType, color: 'btn-secondary' },
+  { label: 'Extract Tasks', icon: ListTodo, action: 'tasks' as ActionType, color: 'btn-accent' },
+  { label: 'Translate', icon: Languages, action: 'translate' as ActionType, color: 'btn-info' },
+];
 
 const DashboardLayout: React.FC = () => {
   const { user } = useAuth();
@@ -138,17 +146,22 @@ const DashboardLayout: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
+    <div className="container mx-auto p-4 sm:p-6 max-w-7xl">
       {/* Header */}
-      <div className="mb-8">
+      <motion.div 
+        className="mb-8"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
           <div className="text-center lg:text-left">
-            <h1 className="text-4xl lg:text-5xl font-bold text-base-content mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-base-content mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               🎯 Workspace
             </h1>
-            <p className="text-base-content/70 text-lg">Transform your text with AI-powered tools</p>
+            <p className="text-base-content/70 text-base sm:text-lg">Transform your text with AI-powered tools</p>
           </div>
-          <div className="flex flex-wrap gap-3 justify-center lg:justify-end">
+          <div className="flex flex-wrap gap-2 sm:gap-3 justify-center lg:justify-end">
             <button
               onClick={() => setShowBrowserInfo(!showBrowserInfo)}
               className="btn btn-ghost btn-sm tooltip tooltip-bottom"
@@ -172,7 +185,7 @@ const DashboardLayout: React.FC = () => {
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Browser Info Alert */}
       <AnimatePresence>
@@ -218,10 +231,15 @@ const DashboardLayout: React.FC = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Input Pane */}
         <div className="space-y-6">
-          <div className="card bg-base-100 shadow-xl border border-base-300">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="card bg-base-100 shadow-xl border border-base-300 hover:shadow-2xl transition-shadow duration-300"
+          >
             <div className="card-body p-6">
               <div className="form-control">
                 <label className="label">
@@ -232,7 +250,7 @@ const DashboardLayout: React.FC = () => {
                   <div className="badge badge-primary badge-lg">Required</div>
                 </label>
                 <textarea
-                  className="textarea textarea-bordered w-full h-80 resize-none text-base focus:textarea-primary shadow-inner"
+                  className="textarea textarea-bordered w-full h-80 resize-none text-base focus:textarea-primary shadow-inner hover:shadow-md transition-shadow duration-200"
                   placeholder="Enter your text here or use voice input..."
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
@@ -245,10 +263,15 @@ const DashboardLayout: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Voice Input */}
-          <div className="card bg-base-100 shadow-xl border border-base-300">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            className="card bg-base-100 shadow-xl border border-base-300 hover:shadow-2xl transition-shadow duration-300"
+          >
             <div className="card-body p-6">
               <div className="form-control">
                 <label className="label">
@@ -318,7 +341,12 @@ const DashboardLayout: React.FC = () => {
 
         {/* Output Pane */}
         <div className="space-y-6">
-          <div className="card bg-base-100 shadow-xl border border-base-300">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="card bg-base-100 shadow-xl border border-base-300 hover:shadow-2xl transition-shadow duration-300"
+          >
             <div className="card-body p-6">
               <div className="form-control">
                 <div className="label">
@@ -406,70 +434,38 @@ const DashboardLayout: React.FC = () => {
         transition={{ delay: 0.2 }}
       >
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-base-content mb-2">AI Actions</h2>
-          <p className="text-base-content/70">Choose an action to process your text</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-base-content mb-2">AI Actions</h2>
+          <p className="text-base-content/70 text-sm sm:text-base">Choose an action to process your text</p>
         </div>
         
-        <div className="flex flex-wrap gap-4 justify-center">
-          <motion.button
-            onClick={() => handleAction('summarize')}
-            className={`btn btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-48 ${
-              activeAction === 'summarize' 
-                ? 'btn-primary loading scale-105' 
-                : 'btn-primary hover:scale-105'
-            }`}
-            disabled={!inputText.trim() || isProcessing}
-            whileHover={{ scale: activeAction !== 'summarize' ? 1.05 : 1 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {activeAction === 'summarize' ? '' : '📝 Summarize'}
-          </motion.button>
-          
-          <motion.button
-            onClick={() => handleAction('clean')}
-            className={`btn btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-48 ${
-              activeAction === 'clean' 
-                ? 'btn-secondary loading scale-105' 
-                : 'btn-secondary hover:scale-105'
-            }`}
-            disabled={!inputText.trim() || isProcessing}
-            whileHover={{ scale: activeAction !== 'clean' ? 1.05 : 1 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {activeAction === 'clean' ? '' : '✨ Clean'}
-          </motion.button>
-          
-          <motion.button
-            onClick={() => handleAction('tasks')}
-            className={`btn btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-48 ${
-              activeAction === 'tasks' 
-                ? 'btn-accent loading scale-105' 
-                : 'btn-accent hover:scale-105'
-            }`}
-            disabled={!inputText.trim() || isProcessing}
-            whileHover={{ scale: activeAction !== 'tasks' ? 1.05 : 1 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {activeAction === 'tasks' ? '' : '✅ Extract Tasks'}
-          </motion.button>
-          
-          <motion.button
-            onClick={() => handleAction('translate')}
-            className={`btn btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-48 ${
-              activeAction === 'translate' 
-                ? 'btn-info loading scale-105' 
-                : 'btn-info hover:scale-105'
-            }`}
-            disabled={!inputText.trim() || isProcessing}
-            whileHover={{ scale: activeAction !== 'translate' ? 1.05 : 1 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {activeAction === 'translate' ? '' : '🌍 Translate'}
-          </motion.button>
+        <div className="flex flex-wrap gap-3 sm:gap-4 justify-center">
+          {actions.map(({ label, icon: Icon, action, color }) => (
+            <motion.button
+              key={action}
+              onClick={() => handleAction(action)}
+              className={`btn btn-sm sm:btn-md lg:btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-36 sm:min-w-44 lg:min-w-48 flex items-center gap-2 sm:gap-3 ${
+                activeAction === action 
+                  ? `${color} loading scale-105` 
+                  : `${color} hover:scale-105`
+              }`}
+              disabled={!inputText.trim() || isProcessing}
+              whileHover={{ scale: activeAction !== action ? 1.05 : 1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {activeAction === action ? (
+                <div className="loading loading-spinner loading-sm"></div>
+              ) : (
+              <>
+                <Icon size={16} className="sm:w-5 sm:h-5" />
+                <span className="text-xs sm:text-sm lg:text-base">{label}</span>
+              </>
+              )}
+            </motion.button>
+          ))}
           
           <motion.button
             onClick={toggleVoiceInput}
-            className={`btn btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-48 ${
+            className={`btn btn-sm sm:btn-md lg:btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-36 sm:min-w-44 lg:min-w-48 flex items-center gap-2 sm:gap-3 ${
               listening 
                 ? 'btn-error loading scale-105' 
                 : 'btn-warning hover:scale-105'
@@ -478,7 +474,14 @@ const DashboardLayout: React.FC = () => {
             whileHover={{ scale: listening ? 1 : 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            {listening ? '' : '🎤 Mic'}
+            {listening ? (
+              <div className="loading loading-spinner loading-sm"></div>
+            ) : (
+              <>
+                <Mic size={16} className="sm:w-5 sm:h-5" />
+                <span className="text-xs sm:text-sm lg:text-base">Voice Input</span>
+              </>
+            )}
           </motion.button>
         </div>
       </motion.div>
