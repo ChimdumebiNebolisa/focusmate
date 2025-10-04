@@ -6,29 +6,32 @@ import {
   summarizeText, 
   rewriteText, 
   extractTasks, 
-  translateText,
-  getBrowserInfo 
+  translateText
 } from '../utils/chromeAI';
 import { saveSession } from '../services/historyService';
 import HistoryPanel from './HistoryPanel';
-import { FileText, Eraser, ListTodo, Languages, Mic } from 'lucide-react';
+import { Mic, Brain, Sparkles, CheckSquare, Globe } from 'lucide-react';
 
 type ActionType = 'summarize' | 'clean' | 'tasks' | 'translate';
 
 const actions = [
-  { label: 'Summarize', icon: FileText, action: 'summarize' as ActionType, color: 'btn-primary' },
-  { label: 'Clean', icon: Eraser, action: 'clean' as ActionType, color: 'btn-secondary' },
-  { label: 'Extract Tasks', icon: ListTodo, action: 'tasks' as ActionType, color: 'btn-accent' },
-  { label: 'Translate', icon: Languages, action: 'translate' as ActionType, color: 'btn-info' },
+  { label: 'Summarize', icon: Brain, action: 'summarize' as ActionType, color: 'from-indigo-500 to-purple-600' },
+  { label: 'Clean', icon: Sparkles, action: 'clean' as ActionType, color: 'from-emerald-500 to-teal-600' },
+  { label: 'Extract Tasks', icon: CheckSquare, action: 'tasks' as ActionType, color: 'from-orange-500 to-red-600' },
+  { label: 'Translate', icon: Globe, action: 'translate' as ActionType, color: 'from-blue-500 to-cyan-600' },
 ];
 
-const DashboardLayout: React.FC = () => {
+interface DashboardLayoutProps {
+  showHistory: boolean;
+  onCloseHistory: () => void;
+}
+
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseHistory }) => {
   const { user } = useAuth();
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeAction, setActiveAction] = useState<ActionType | null>(null);
-  const [showHistory, setShowHistory] = useState(false);
   const [showBrowserInfo, setShowBrowserInfo] = useState(false);
   const [saveHistory, setSaveHistory] = useState(true);
   const [copySuccess, setCopySuccess] = useState(false);
@@ -146,233 +149,176 @@ const DashboardLayout: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+    <div className="max-w-7xl mx-auto px-8 py-6">
       {/* Header */}
       <motion.div 
-        className="mb-8"
-        initial={{ opacity: 0, y: -20 }}
+        className="text-center mb-12"
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.6 }}
       >
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-6">
-          <div className="text-center lg:text-left">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-base-content mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              🎯 Workspace
-            </h1>
-            <p className="text-base-content/70 text-lg sm:text-xl max-w-2xl">
-              Transform your thoughts into organized, actionable content with AI-powered tools
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3 justify-center lg:justify-end">
-            <button
-              onClick={() => setShowBrowserInfo(!showBrowserInfo)}
-              className="btn btn-ghost btn-sm tooltip tooltip-bottom"
-              data-tip="Browser compatibility info"
-            >
-              <span className="text-lg">ℹ️</span>
-            </button>
-            <button
-              onClick={() => setShowHistory(true)}
-              className="btn btn-outline btn-sm shadow-lg hover:shadow-xl transition-all duration-200"
-            >
-              <span className="text-lg mr-2">🕒</span>
-              History
-            </button>
-            <button 
-              onClick={clearAll} 
-              className="btn btn-outline btn-sm shadow-lg hover:shadow-xl transition-all duration-200"
-            >
-              <span className="text-lg mr-2">🗑️</span>
-              Clear All
-            </button>
-          </div>
-        </div>
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-base-content mb-4">
+          Transform your thoughts into clarity.
+        </h1>
+        <p className="text-base-content/70 text-lg md:text-xl max-w-3xl mx-auto">
+          Your AI assistant for cleaning, summarizing, and translating content.
+        </p>
       </motion.div>
 
-      {/* Browser Info Alert */}
-      <AnimatePresence>
-        {showBrowserInfo && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mb-4"
-          >
-            <div className="alert alert-info">
-              <div>
-                <span>{getBrowserInfo()}</span>
-                <button
-                  onClick={() => setShowBrowserInfo(false)}
-                  className="btn btn-sm btn-ghost ml-2"
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
-      {/* Save History Toggle */}
-      {user && (
-        <div className="mb-6">
-          <div className="card bg-base-200 shadow-sm">
-            <div className="card-body py-3">
-              <div className="flex items-center gap-3">
-                <input
-                  type="checkbox"
-                  className="toggle toggle-sm toggle-primary"
-                  checked={saveHistory}
-                  onChange={(e) => setSaveHistory(e.target.checked)}
-                />
-                <span className="text-sm font-medium">Save session history</span>
-                <div className="badge badge-outline badge-sm">Auto-save enabled</div>
+      {/* Two Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Left Panel - Input */}
+        <motion.div
+          initial={{ opacity: 0, x: -30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+          className="space-y-6"
+        >
+          {/* Input Card */}
+          <div className="card bg-base-100 shadow-xl rounded-2xl border border-base-300 hover:shadow-2xl transition-all duration-300">
+            <div className="card-body p-8">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-base-content mb-2">Input Text</h2>
+                <p className="text-base-content/70">Type or use voice input to capture ideas.</p>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-        {/* Input Pane */}
-        <div className="space-y-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="card bg-base-200 shadow-xl border border-base-300 hover:shadow-2xl transition-shadow duration-300"
-          >
-            <div className="card-body p-6">
+              
               <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold text-xl flex items-center gap-3">
-                    <span className="text-2xl">📝</span>
-                    Input Text
-                  </span>
-                  <div className="badge badge-primary badge-lg">Required</div>
-                </label>
                 <textarea
-                  className="textarea textarea-bordered w-full h-80 resize-none text-base focus:textarea-primary shadow-inner hover:shadow-md transition-shadow duration-200 bg-base-100"
+                  className="textarea textarea-bordered w-full h-48 resize-none text-base focus:textarea-primary shadow-inner hover:shadow-md transition-shadow duration-200 bg-base-100 rounded-xl"
                   placeholder="Enter your text here or use voice input..."
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   disabled={isProcessing}
                 />
-                <div className="label">
-                  <span className="label-text-alt text-base-content/60">
+                
+                {/* Voice Input Button */}
+                <div className="flex items-center justify-between mt-4">
+                  <div className="text-sm text-base-content/60">
                     {inputText.length} characters
-                  </span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Voice Input */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className="card bg-base-200 shadow-xl border border-base-300 hover:shadow-2xl transition-shadow duration-300"
-          >
-            <div className="card-body p-6">
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold text-xl flex items-center gap-2">
-                    <span className="text-2xl">🎤</span>
-                    Voice Input
-                  </span>
-                  <div className="badge badge-secondary badge-lg">Optional</div>
-                </label>
-                {speechSupported ? (
-                  <div className="space-y-4">
+                  </div>
+                  
+                  {speechSupported && (
                     <button
                       onClick={toggleVoiceInput}
-                      className={`btn w-full ${
+                      className={`btn btn-circle ${
                         listening 
                           ? 'btn-error animate-pulse' 
                           : 'btn-outline'
                       }`}
                       disabled={isProcessing}
+                      title={listening ? 'Stop Recording' : 'Start Voice Input'}
                     >
-                      <span className="text-lg mr-2">
-                        {listening ? '🛑' : '🎤'}
-                      </span>
-                      {listening ? 'Stop Recording' : 'Start Voice Input'}
+                      <Mic className="w-5 h-5" />
                     </button>
+                  )}
+                </div>
                 
-                    {/* Voice Status */}
-                    {listening && (
-                      <div className="text-center">
-                        <div className="flex items-center justify-center gap-2 text-sm">
-                          <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                            <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                          </div>
-                          <span className="text-red-600 font-medium">Listening...</span>
-                        </div>
-                        
-                        {interimTranscript && (
-                          <div className="mt-2 p-3 bg-base-300 rounded-lg text-sm text-base-content/80">
-                            <span className="italic">"{interimTranscript}"</span>
-                            {confidence > 0 && (
-                              <span className="ml-2 text-base-content/60">
-                                ({(confidence * 100).toFixed(0)}% confidence)
-                              </span>
-                            )}
-                          </div>
+                {/* Voice Status */}
+                {listening && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="mt-4 p-4 bg-base-200 rounded-xl"
+                  >
+                    <div className="flex items-center justify-center gap-2 text-sm">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                        <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                      </div>
+                      <span className="text-red-600 font-medium">Listening...</span>
+                    </div>
+                    
+                    {interimTranscript && (
+                      <div className="mt-3 p-3 bg-base-300 rounded-lg text-sm text-base-content/80">
+                        <span className="italic">"{interimTranscript}"</span>
+                        {confidence > 0 && (
+                          <span className="ml-2 text-base-content/60">
+                            ({(confidence * 100).toFixed(0)}% confidence)
+                          </span>
                         )}
                       </div>
                     )}
-                  </div>
-                ) : (
-                  <div className="alert alert-warning">
-                    <span>🎤 Voice input not supported in this browser</span>
-                  </div>
+                  </motion.div>
                 )}
                 
                 {speechError && (
-                  <div className="alert alert-error mt-2">
+                  <div className="alert alert-error mt-4">
                     <span className="text-xs whitespace-pre-line">{speechError}</span>
                   </div>
                 )}
               </div>
             </div>
-          </motion.div>
-        </div>
+          </div>
 
-        {/* Output Pane */}
-        <div className="space-y-6">
+          {/* Action Toolbar */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            className="card bg-base-200 shadow-xl border border-base-300 hover:shadow-2xl transition-shadow duration-300"
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="grid grid-cols-2 gap-4"
           >
-            <div className="card-body p-6">
-              <div className="form-control">
-                <div className="label">
-                  <span className="label-text font-semibold text-xl flex items-center gap-2">
-                    <span className="text-2xl">✨</span>
-                    Output
-                  </span>
-                  {outputText && (
-                    <button
-                      onClick={copyOutput}
-                      className={`btn btn-sm shadow-md hover:shadow-lg transition-all duration-200 ${copySuccess ? 'btn-success' : 'btn-outline'}`}
-                    >
-                      {copySuccess ? '✓ Copied!' : '📋 Copy'}
-                    </button>
-                  )}
+            {actions.map(({ label, icon: Icon, action, color }) => (
+              <motion.button
+                key={action}
+                onClick={() => handleAction(action)}
+                className={`btn btn-lg shadow-xl hover:shadow-2xl transition-all duration-200 rounded-2xl flex items-center gap-3 bg-gradient-to-r ${color} text-white border-0 ${
+                  activeAction === action 
+                    ? 'loading scale-105' 
+                    : 'hover:scale-105'
+                }`}
+                disabled={!inputText.trim() || isProcessing}
+                whileHover={{ scale: activeAction !== action ? 1.05 : 1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {activeAction === action ? (
+                  <div className="loading loading-spinner loading-sm"></div>
+                ) : (
+                  <>
+                    <Icon size={20} />
+                    <span className="text-sm font-medium">{label}</span>
+                  </>
+                )}
+              </motion.button>
+            ))}
+          </motion.div>
+        </motion.div>
+
+        {/* Right Panel - Output */}
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="space-y-6"
+        >
+          {/* Output Card */}
+          <div className="card bg-base-100 shadow-xl rounded-2xl border border-base-300 hover:shadow-2xl transition-all duration-300">
+            <div className="card-body p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-base-content mb-2">Output</h2>
+                  <p className="text-base-content/70">Your processed result will appear here.</p>
                 </div>
-                <motion.div 
-                  className="card bg-base-100 h-80 shadow-sm border border-base-300"
-                  layout
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <div className="card-body p-6">
+                {outputText && (
+                  <button
+                    onClick={copyOutput}
+                    className={`btn btn-sm shadow-md hover:shadow-lg transition-all duration-200 rounded-xl ${
+                      copySuccess ? 'btn-success' : 'btn-outline'
+                    }`}
+                  >
+                    {copySuccess ? '✓ Copied!' : '📋 Copy'}
+                  </button>
+                )}
+              </div>
+              
+              <motion.div 
+                className="bg-base-200 h-80 rounded-xl p-6 overflow-y-auto"
+                layout
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.2 }}
+              >
                 {isProcessing ? (
                   <motion.div 
                     className="flex items-center justify-center h-full"
@@ -380,13 +326,13 @@ const DashboardLayout: React.FC = () => {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    <div className="flex flex-col items-center gap-3">
+                    <div className="flex flex-col items-center gap-4">
                       <div className="loading loading-spinner loading-lg text-primary"></div>
                       <div className="text-center">
-                        <p className="text-base-content/80 font-medium">
+                        <p className="text-base-content/80 font-medium text-lg">
                           {activeAction ? `Processing ${activeAction}...` : 'Processing...'}
                         </p>
-                        <p className="text-xs text-base-content/60 mt-1">
+                        <p className="text-sm text-base-content/60 mt-1">
                           Using Chrome AI
                         </p>
                       </div>
@@ -399,7 +345,7 @@ const DashboardLayout: React.FC = () => {
                     transition={{ duration: 0.3, ease: "easeOut" }}
                     className="h-full overflow-y-auto"
                   >
-                    <p className="text-base-content whitespace-pre-wrap leading-relaxed">
+                    <p className="text-base-content whitespace-pre-wrap leading-relaxed text-base">
                       {outputText}
                     </p>
                   </motion.div>
@@ -420,80 +366,16 @@ const DashboardLayout: React.FC = () => {
                     </div>
                   </motion.div>
                 )}
-                  </div>
-                </motion.div>
-              </div>
+              </motion.div>
             </div>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </div>
-
-      {/* Action Toolbar */}
-      <motion.div 
-        className="mt-16"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-      >
-        <div className="text-center mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-base-content mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            AI Actions
-          </h2>
-          <p className="text-base-content/70 text-base sm:text-lg">Choose an action to process your text with Chrome AI</p>
-        </div>
-        
-        <div className="flex flex-wrap gap-4 sm:gap-6 justify-center max-w-4xl mx-auto">
-          {actions.map(({ label, icon: Icon, action, color }) => (
-            <motion.button
-              key={action}
-              onClick={() => handleAction(action)}
-              className={`btn btn-lg shadow-xl hover:shadow-2xl transition-all duration-200 min-w-40 sm:min-w-48 lg:min-w-52 flex items-center gap-3 ${
-                activeAction === action 
-                  ? `${color} loading scale-105` 
-                  : `${color} hover:scale-105`
-              }`}
-              disabled={!inputText.trim() || isProcessing}
-              whileHover={{ scale: activeAction !== action ? 1.05 : 1 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {activeAction === action ? (
-                <div className="loading loading-spinner loading-sm"></div>
-              ) : (
-              <>
-                <Icon size={20} />
-                <span className="text-sm font-medium">{label}</span>
-              </>
-              )}
-            </motion.button>
-          ))}
-          
-          <motion.button
-            onClick={toggleVoiceInput}
-            className={`btn btn-lg shadow-xl hover:shadow-2xl transition-all duration-200 min-w-40 sm:min-w-48 lg:min-w-52 flex items-center gap-3 ${
-              listening 
-                ? 'btn-error loading scale-105' 
-                : 'btn-warning hover:scale-105'
-            }`}
-            disabled={isProcessing}
-            whileHover={{ scale: listening ? 1 : 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {listening ? (
-              <div className="loading loading-spinner loading-sm"></div>
-            ) : (
-              <>
-                <Mic size={20} />
-                <span className="text-sm font-medium">Voice Input</span>
-              </>
-            )}
-          </motion.button>
-        </div>
-      </motion.div>
 
       {/* History Panel */}
       <HistoryPanel
         isOpen={showHistory}
-        onClose={() => setShowHistory(false)}
+        onClose={onCloseHistory}
         onRestoreSession={handleRestoreSession}
       />
 

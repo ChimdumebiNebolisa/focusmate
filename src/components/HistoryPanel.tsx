@@ -118,17 +118,17 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed right-0 top-0 h-full w-96 bg-base-100 shadow-xl z-50 overflow-hidden"
+            className="fixed right-0 top-0 h-full w-96 bg-base-100 shadow-2xl z-50 overflow-hidden border-l border-base-300"
           >
             <div className="flex flex-col h-full">
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-base-300">
-                <h2 className="text-xl font-semibold">Session History</h2>
+              <div className="flex items-center justify-between p-6 border-b border-base-300 bg-gradient-to-r from-primary/10 to-secondary/10">
+                <h2 className="text-xl font-bold text-base-content">Session History</h2>
                 <div className="flex gap-2">
                   {sessions.length > 0 && (
                     <button
                       onClick={handleClearAll}
-                      className="btn btn-sm btn-ghost text-error"
+                      className="btn btn-sm btn-ghost text-error hover:bg-error/10"
                       title="Clear all sessions"
                     >
                       🗑️
@@ -136,7 +136,7 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
                   )}
                   <button
                     onClick={onClose}
-                    className="btn btn-sm btn-ghost"
+                    className="btn btn-sm btn-ghost hover:bg-base-300"
                   >
                     ✕
                   </button>
@@ -144,7 +144,7 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
               </div>
 
               {/* Content */}
-              <div className="flex-1 overflow-y-auto p-4">
+              <div className="flex-1 overflow-y-auto p-6">
                 {loading ? (
                   <div className="flex items-center justify-center h-32">
                     <div className="loading loading-spinner loading-md"></div>
@@ -160,21 +160,21 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
                     </button>
                   </div>
                 ) : sessions.length === 0 ? (
-                  <div className="text-center text-base-content/60 py-8">
-                    <div className="text-4xl mb-2">📝</div>
-                    <p>No sessions yet</p>
-                    <p className="text-sm">Your processed text will appear here</p>
+                  <div className="text-center text-base-content/60 py-12">
+                    <div className="text-6xl mb-4">📝</div>
+                    <p className="text-lg font-medium">No sessions yet</p>
+                    <p className="text-sm mt-2">Your processed text will appear here</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {sessions.map((session) => (
                       <motion.div
                         key={session.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="card bg-base-200 shadow-sm"
+                        className="card bg-base-200 shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl border border-base-300"
                       >
-                        <div className="card-body p-4">
+                        <div className="card-body p-5">
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex items-center gap-2">
                               <span className="text-lg">
@@ -187,14 +187,14 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
                             <div className="flex gap-1">
                               <button
                                 onClick={() => handleRestore(session)}
-                                className="btn btn-xs btn-ghost"
+                                className="btn btn-xs btn-ghost hover:bg-primary/10"
                                 title="Restore session"
                               >
                                 ↩️
                               </button>
                               <button
                                 onClick={() => handleDeleteSession(session.id)}
-                                className="btn btn-xs btn-ghost text-error"
+                                className="btn btn-xs btn-ghost text-error hover:bg-error/10"
                                 title="Delete session"
                               >
                                 🗑️
@@ -202,16 +202,16 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
                             </div>
                           </div>
                           
-                          <div className="space-y-2">
+                          <div className="space-y-3">
                             <div>
-                              <p className="text-xs text-base-content/60 mb-1">Input:</p>
-                              <p className="text-sm line-clamp-2 bg-base-300 p-2 rounded">
+                              <p className="text-xs text-base-content/60 mb-2 font-medium">Input:</p>
+                              <p className="text-sm line-clamp-2 bg-base-300 p-3 rounded-lg border border-base-300">
                                 {session.input}
                               </p>
                             </div>
                             <div>
-                              <p className="text-xs text-base-content/60 mb-1">Output:</p>
-                              <p className="text-sm line-clamp-2 bg-base-300 p-2 rounded">
+                              <p className="text-xs text-base-content/60 mb-2 font-medium">Output:</p>
+                              <p className="text-sm line-clamp-2 bg-base-300 p-3 rounded-lg border border-base-300">
                                 {session.output}
                               </p>
                             </div>

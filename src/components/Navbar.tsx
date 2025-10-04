@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Menu, LogOut, Settings, Zap } from 'lucide-react';
+import { Menu, LogOut, Settings, Zap, History, Plus, Sun, Moon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+  onNewSession?: () => void;
+  onHistoryClick?: () => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ onNewSession, onHistoryClick }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDark, setIsDark] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -19,127 +25,147 @@ const Navbar: React.FC = () => {
   };
 
   const handleNewSession = () => {
-    // Reset the workspace for a new session
-    window.location.reload();
+    if (onNewSession) {
+      onNewSession();
+    } else {
+      window.location.reload();
+    }
+  };
+
+  const handleHistoryClick = () => {
+    if (onHistoryClick) {
+      onHistoryClick();
+    }
+  };
+
+  const toggleTheme = () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    setIsDark(newTheme === 'dark');
   };
 
   return (
-    <nav className="navbar sticky top-0 z-50 bg-gradient-to-r from-primary/90 to-secondary/90 backdrop-blur-md shadow-lg border-b border-base-300">
-      <div className="navbar-start">
-        <div className="dropdown">
-          <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden text-white">
-            <Menu className="w-5 h-5" />
-          </div>
-          <ul
-            tabIndex={0}
-            className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-xl bg-base-100 rounded-box w-52 border border-base-300"
-          >
-            <li>
-              <button onClick={handleNewSession} className="btn btn-primary btn-sm w-full">
-                <span className="mr-2">✨</span>
-                New Session
-              </button>
-            </li>
-            <li>
-              <button onClick={() => navigate('/settings')} className="btn btn-ghost btn-sm w-full">
-                <Settings className="w-4 h-4" />
-                Settings
-              </button>
-            </li>
-            <li>
-              <button onClick={handleLogout} className="btn btn-error btn-sm w-full">
-                <LogOut className="w-4 h-4" />
-                Logout
-              </button>
-            </li>
-          </ul>
-        </div>
-        <motion.a 
-          className="btn btn-ghost text-xl font-bold text-white hover:bg-white/20 flex items-center gap-2"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <motion.div
-            animate={{ 
-              rotate: [0, 10, -10, 0],
-              scale: [1, 1.1, 1]
-            }}
-            transition={{ 
-              duration: 2,
-              repeat: Infinity,
-              repeatDelay: 3
-            }}
-          >
-            <Zap size={24} className="text-yellow-300" />
-          </motion.div>
-          <span>FocusMate</span>
-        </motion.a>
-      </div>
-
-      <div className="navbar-center hidden lg:flex">
-        <button
-          onClick={handleNewSession}
-          className="btn btn-primary btn-sm shadow-lg hover:shadow-xl transition-all duration-200"
-        >
-          <span className="mr-2">✨</span>
-          New Session
-        </button>
-      </div>
-
-      <div className="navbar-end">
-        {/* Theme Toggle */}
-        <div className="mr-4">
-          <button
-            className="btn btn-ghost btn-circle"
-            onClick={() => {
-              const currentTheme = document.documentElement.getAttribute('data-theme');
-              const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-              document.documentElement.setAttribute('data-theme', newTheme);
-            }}
-            title="Toggle theme"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-            </svg>
-          </button>
-        </div>
-        <div className="dropdown dropdown-end">
-          <div
-            tabIndex={0}
-            role="button"
-            className="btn btn-ghost btn-circle avatar"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <div className="w-10 rounded-full ring ring-white ring-offset-2 ring-offset-primary">
-              <img
-                alt="Profile"
-                src={user?.photoURL || 'https://via.placeholder.com/40x40/6366f1/ffffff?text=U'}
-                className="w-full h-full object-cover"
-              />
+    <nav className="navbar fixed top-0 z-50 bg-base-100/80 backdrop-blur-md shadow-lg border-b border-base-300">
+      <div className="max-w-7xl mx-auto w-full px-8">
+        <div className="navbar-start">
+          {/* Mobile Menu */}
+          <div className="dropdown lg:hidden">
+            <div tabIndex={0} role="button" className="btn btn-ghost">
+              <Menu className="w-5 h-5" />
             </div>
+            <ul
+              tabIndex={0}
+              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-xl bg-base-100 rounded-box w-52 border border-base-300"
+            >
+              <li>
+                <button onClick={handleNewSession} className="flex items-center gap-2">
+                  <Plus className="w-4 h-4" />
+                  New Session
+                </button>
+              </li>
+              <li>
+                <button onClick={handleHistoryClick} className="flex items-center gap-2">
+                  <History className="w-4 h-4" />
+                  History
+                </button>
+              </li>
+              <li>
+                <button onClick={() => navigate('/settings')} className="flex items-center gap-2">
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </button>
+              </li>
+              <li>
+                <button onClick={handleLogout} className="flex items-center gap-2 text-error">
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </button>
+              </li>
+            </ul>
           </div>
-          <ul
-            tabIndex={0}
-            className={`menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-xl bg-base-100 rounded-box w-52 border border-base-300 ${
-              isMenuOpen ? 'block' : 'hidden'
-            }`}
+
+          {/* Logo */}
+          <motion.div 
+            className="flex items-center gap-2"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            <li className="menu-title">
-              <span className="font-semibold">{user?.displayName || 'User'}</span>
-            </li>
-            <li>
-              <button onClick={() => navigate('/settings')} className="btn btn-ghost btn-sm w-full">
-                <Settings className="w-4 h-4" />
-                Settings
-              </button>
-            </li>
-            <li>
-              <button onClick={handleLogout} className="btn btn-error btn-sm w-full">
-                <LogOut className="w-4 h-4" />
-                Logout
-              </button>
-            </li>
-          </ul>
+            <motion.div
+              animate={{ 
+                rotate: [0, 10, -10, 0],
+                scale: [1, 1.1, 1]
+              }}
+              transition={{ 
+                duration: 2,
+                repeat: Infinity,
+                repeatDelay: 3
+              }}
+            >
+              <Zap size={24} className="text-primary" />
+            </motion.div>
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              FocusMate
+            </span>
+          </motion.div>
+        </div>
+
+        <div className="navbar-end">
+          {/* Desktop Buttons */}
+          <div className="hidden lg:flex items-center gap-2">
+            <button
+              onClick={handleNewSession}
+              className="btn btn-primary btn-sm shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              <Plus className="w-4 h-4" />
+              New Session
+            </button>
+            
+            <button
+              onClick={handleHistoryClick}
+              className="btn btn-ghost btn-sm shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              <History className="w-4 h-4" />
+              History
+            </button>
+            
+            <button
+              onClick={() => navigate('/settings')}
+              className="btn btn-ghost btn-sm shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              <Settings className="w-4 h-4" />
+              Settings
+            </button>
+
+            {/* Theme Toggle */}
+            <button
+              className="btn btn-ghost btn-circle btn-sm"
+              onClick={toggleTheme}
+              title="Toggle theme"
+            >
+              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+
+            {/* Logout */}
+            <button
+              onClick={handleLogout}
+              className="btn btn-error btn-sm shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </button>
+          </div>
+
+          {/* Mobile Theme Toggle */}
+          <div className="lg:hidden">
+            <button
+              className="btn btn-ghost btn-circle btn-sm"
+              onClick={toggleTheme}
+              title="Toggle theme"
+            >
+              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
       </div>
     </nav>
