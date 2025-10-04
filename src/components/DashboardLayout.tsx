@@ -24,6 +24,8 @@ const DashboardLayout: React.FC = () => {
   const [showBrowserInfo, setShowBrowserInfo] = useState(false);
   const [saveHistory, setSaveHistory] = useState(true);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const {
     transcript,
@@ -32,7 +34,9 @@ const DashboardLayout: React.FC = () => {
     startListening,
     stopListening,
     resetTranscript,
-    error: speechError
+    error: speechError,
+    interimTranscript,
+    confidence
   } = useSpeechRecognition();
 
   // Update input text when speech recognition produces results
@@ -50,6 +54,8 @@ const DashboardLayout: React.FC = () => {
     setIsProcessing(true);
     setActiveAction(type);
     setOutputText('');
+
+    const startTime = Date.now();
 
     try {
       let result = '';
@@ -71,14 +77,24 @@ const DashboardLayout: React.FC = () => {
       
       setOutputText(result);
 
+      // Show success message
+      if (result && !result.includes('Chrome AI API not supported')) {
+        setSuccessMessage(`${type.charAt(0).toUpperCase() + type.slice(1)} completed successfully!`);
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      }
+
       // Save to history if user is logged in and saveHistory is enabled
       if (user && saveHistory && result && !result.includes('Chrome AI API not supported')) {
         try {
+          const processingTime = Date.now() - startTime;
           await saveSession(user.uid, {
             input: inputText,
             output: result,
-            action: type
+            action: type,
+            processingTime
           });
+          console.log(`✅ Session saved in ${processingTime}ms`);
         } catch (error) {
           console.error('Failed to save session:', error);
         }
@@ -202,26 +218,53 @@ const DashboardLayout: React.FC = () => {
           {/* Voice Input */}
           <div className="form-control">
             {speechSupported ? (
-              <button
-                onClick={toggleVoiceInput}
-                className={`btn btn-sm w-full ${
-                  listening 
-                    ? 'btn-error animate-pulse' 
-                    : 'btn-outline'
-                }`}
-                disabled={isProcessing}
-              >
-                {listening ? '🛑 Stop Recording' : '🎤 Voice Input'}
-              </button>
+              <div className="space-y-2">
+                <button
+                  onClick={toggleVoiceInput}
+                  className={`btn btn-sm w-full ${
+                    listening 
+                      ? 'btn-error animate-pulse' 
+                      : 'btn-outline'
+                  }`}
+                  disabled={isProcessing}
+                >
+                  {listening ? '🛑 Stop Recording' : '🎤 Voice Input'}
+                </button>
+                
+                {/* Voice Status */}
+                {listening && (
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-2 text-sm">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                        <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                      </div>
+                      <span className="text-red-600 font-medium">Listening...</span>
+                    </div>
+                    
+                    {interimTranscript && (
+                      <div className="mt-2 p-2 bg-base-300 rounded text-xs text-base-content/80">
+                        <span className="italic">"{interimTranscript}"</span>
+                        {confidence > 0 && (
+                          <span className="ml-2 text-base-content/60">
+                            ({(confidence * 100).toFixed(0)}% confidence)
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="alert alert-warning">
-                <span>Voice input not supported in this browser</span>
+                <span>🎤 Voice input not supported in this browser</span>
               </div>
             )}
             
             {speechError && (
               <div className="alert alert-error mt-2">
-                <span className="text-xs">{speechError}</span>
+                <span className="text-xs whitespace-pre-line">{speechError}</span>
               </div>
             )}
           </div>
@@ -242,31 +285,59 @@ const DashboardLayout: React.FC = () => {
               )}
             </div>
             <motion.div 
-              className="card bg-base-200 h-64"
+              className="card bg-base-200 h-64 shadow-sm"
               layout
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.2 }}
             >
-              <div className="card-body">
+              <div className="card-body p-4">
                 {isProcessing ? (
-                  <div className="flex items-center justify-center h-full">
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="loading loading-spinner loading-lg"></div>
-                      <p className="text-base-content/60">
-                        {activeAction ? `Processing ${activeAction}...` : 'Processing...'}
+                  <motion.div 
+                    className="flex items-center justify-center h-full"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="loading loading-spinner loading-lg text-primary"></div>
+                      <div className="text-center">
+                        <p className="text-base-content/80 font-medium">
+                          {activeAction ? `Processing ${activeAction}...` : 'Processing...'}
+                        </p>
+                        <p className="text-xs text-base-content/60 mt-1">
+                          Using Chrome AI
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ) : outputText ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="h-full overflow-y-auto"
+                  >
+                    <p className="text-base-content whitespace-pre-wrap leading-relaxed">
+                      {outputText}
+                    </p>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex items-center justify-center h-full"
+                  >
+                    <div className="text-center">
+                      <div className="text-4xl mb-2">✨</div>
+                      <p className="text-base-content/60 italic">
+                        Processed text will appear here...
+                      </p>
+                      <p className="text-xs text-base-content/40 mt-1">
+                        Try summarizing, cleaning, extracting tasks, or translating
                       </p>
                     </div>
-                  </div>
-                ) : outputText ? (
-                  <motion.p
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-base-content whitespace-pre-wrap"
-                  >
-                    {outputText}
-                  </motion.p>
-                ) : (
-                  <p className="text-base-content/60 italic">
-                    Processed text will appear here...
-                  </p>
+                  </motion.div>
                 )}
               </div>
             </motion.div>
@@ -275,36 +346,68 @@ const DashboardLayout: React.FC = () => {
       </div>
 
       {/* Action Buttons */}
-      <div className="mt-6 flex flex-wrap gap-3 justify-center">
-        <button
+      <motion.div 
+        className="mt-8 flex flex-wrap gap-4 justify-center"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        <motion.button
           onClick={() => handleAction('summarize')}
-          className={`btn ${activeAction === 'summarize' ? 'btn-primary loading' : 'btn-primary'}`}
+          className={`btn btn-lg shadow-md hover:shadow-lg transition-all duration-200 ${
+            activeAction === 'summarize' 
+              ? 'btn-primary loading scale-105' 
+              : 'btn-primary hover:scale-105'
+          }`}
           disabled={!inputText.trim() || isProcessing}
+          whileHover={{ scale: activeAction !== 'summarize' ? 1.05 : 1 }}
+          whileTap={{ scale: 0.95 }}
         >
           {activeAction === 'summarize' ? '' : '📝 Summarize'}
-        </button>
-        <button
+        </motion.button>
+        
+        <motion.button
           onClick={() => handleAction('clean')}
-          className={`btn ${activeAction === 'clean' ? 'btn-secondary loading' : 'btn-secondary'}`}
+          className={`btn btn-lg shadow-md hover:shadow-lg transition-all duration-200 ${
+            activeAction === 'clean' 
+              ? 'btn-secondary loading scale-105' 
+              : 'btn-secondary hover:scale-105'
+          }`}
           disabled={!inputText.trim() || isProcessing}
+          whileHover={{ scale: activeAction !== 'clean' ? 1.05 : 1 }}
+          whileTap={{ scale: 0.95 }}
         >
           {activeAction === 'clean' ? '' : '✨ Clean'}
-        </button>
-        <button
+        </motion.button>
+        
+        <motion.button
           onClick={() => handleAction('tasks')}
-          className={`btn ${activeAction === 'tasks' ? 'btn-accent loading' : 'btn-accent'}`}
+          className={`btn btn-lg shadow-md hover:shadow-lg transition-all duration-200 ${
+            activeAction === 'tasks' 
+              ? 'btn-accent loading scale-105' 
+              : 'btn-accent hover:scale-105'
+          }`}
           disabled={!inputText.trim() || isProcessing}
+          whileHover={{ scale: activeAction !== 'tasks' ? 1.05 : 1 }}
+          whileTap={{ scale: 0.95 }}
         >
           {activeAction === 'tasks' ? '' : '✅ Extract Tasks'}
-        </button>
-        <button
+        </motion.button>
+        
+        <motion.button
           onClick={() => handleAction('translate')}
-          className={`btn ${activeAction === 'translate' ? 'btn-info loading' : 'btn-info'}`}
+          className={`btn btn-lg shadow-md hover:shadow-lg transition-all duration-200 ${
+            activeAction === 'translate' 
+              ? 'btn-info loading scale-105' 
+              : 'btn-info hover:scale-105'
+          }`}
           disabled={!inputText.trim() || isProcessing}
+          whileHover={{ scale: activeAction !== 'translate' ? 1.05 : 1 }}
+          whileTap={{ scale: 0.95 }}
         >
           {activeAction === 'translate' ? '' : '🌍 Translate'}
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
       {/* History Panel */}
       <HistoryPanel
@@ -312,6 +415,25 @@ const DashboardLayout: React.FC = () => {
         onClose={() => setShowHistory(false)}
         onRestoreSession={handleRestoreSession}
       />
+
+      {/* Success Toast */}
+      <AnimatePresence>
+        {showSuccessToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            className="fixed bottom-4 right-4 z-50"
+          >
+            <div className="alert alert-success shadow-lg">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">✅</span>
+                <span className="font-medium">{successMessage}</span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

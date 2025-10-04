@@ -217,9 +217,16 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
                             </div>
                           </div>
                           
-                          <p className="text-xs text-base-content/60 mt-2">
-                            {formatDistanceToNow(session.createdAt.toDate(), { addSuffix: true })}
-                          </p>
+                          <div className="flex items-center justify-between mt-2">
+                            <p className="text-xs text-base-content/60">
+                              {formatDistanceToNow(session.createdAt.toDate(), { addSuffix: true })}
+                            </p>
+                            {session.processingTime && (
+                              <p className="text-xs text-base-content/40">
+                                {(session.processingTime / 1000).toFixed(1)}s
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </motion.div>
                     ))}
