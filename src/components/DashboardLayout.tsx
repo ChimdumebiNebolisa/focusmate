@@ -138,27 +138,36 @@ const DashboardLayout: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-6 max-w-7xl">
       {/* Header */}
-      <div className="mb-6 flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Workspace</h1>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setShowBrowserInfo(!showBrowserInfo)}
-            className="btn btn-ghost btn-sm"
-            title="Browser compatibility info"
-          >
-            ℹ️
-          </button>
-          <button
-            onClick={() => setShowHistory(true)}
-            className="btn btn-outline btn-sm"
-          >
-            🕒 History
-          </button>
-          <button onClick={clearAll} className="btn btn-outline btn-sm">
-            Clear All
-          </button>
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h1 className="text-4xl font-bold text-base-content mb-2">Workspace</h1>
+            <p className="text-base-content/70">Transform your text with AI-powered tools</p>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowBrowserInfo(!showBrowserInfo)}
+              className="btn btn-ghost btn-sm"
+              title="Browser compatibility info"
+            >
+              <span className="text-lg">ℹ️</span>
+            </button>
+            <button
+              onClick={() => setShowHistory(true)}
+              className="btn btn-outline btn-sm"
+            >
+              <span className="text-lg mr-2">🕒</span>
+              History
+            </button>
+            <button 
+              onClick={clearAll} 
+              className="btn btn-outline btn-sm"
+            >
+              Clear All
+            </button>
+          </div>
         </div>
       </div>
 
@@ -188,110 +197,140 @@ const DashboardLayout: React.FC = () => {
 
       {/* Save History Toggle */}
       {user && (
-        <div className="mb-4 flex items-center gap-2">
-          <input
-            type="checkbox"
-            className="toggle toggle-sm"
-            checked={saveHistory}
-            onChange={(e) => setSaveHistory(e.target.checked)}
-          />
-          <span className="text-sm">Save session history</span>
+        <div className="mb-6">
+          <div className="card bg-base-200 shadow-sm">
+            <div className="card-body py-3">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  className="toggle toggle-sm toggle-primary"
+                  checked={saveHistory}
+                  onChange={(e) => setSaveHistory(e.target.checked)}
+                />
+                <span className="text-sm font-medium">Save session history</span>
+                <div className="badge badge-outline badge-sm">Auto-save enabled</div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Input Pane */}
-        <div className="space-y-4">
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-semibold">Input Text</span>
-            </label>
-            <textarea
-              className="textarea textarea-bordered w-full h-64 resize-none"
-              placeholder="Enter your text here or use voice input..."
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              disabled={isProcessing}
-            />
+        <div className="space-y-6">
+          <div className="card bg-base-200 shadow-lg">
+            <div className="card-body">
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold text-lg">Input Text</span>
+                  <div className="badge badge-primary badge-sm">Required</div>
+                </label>
+                <textarea
+                  className="textarea textarea-bordered w-full h-80 resize-none text-base"
+                  placeholder="Enter your text here or use voice input..."
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  disabled={isProcessing}
+                />
+                <div className="label">
+                  <span className="label-text-alt text-base-content/60">
+                    {inputText.length} characters
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Voice Input */}
-          <div className="form-control">
-            {speechSupported ? (
-              <div className="space-y-2">
-                <button
-                  onClick={toggleVoiceInput}
-                  className={`btn btn-sm w-full ${
-                    listening 
-                      ? 'btn-error animate-pulse' 
-                      : 'btn-outline'
-                  }`}
-                  disabled={isProcessing}
-                >
-                  {listening ? '🛑 Stop Recording' : '🎤 Voice Input'}
-                </button>
+          <div className="card bg-base-200 shadow-lg">
+            <div className="card-body">
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold">Voice Input</span>
+                  <div className="badge badge-secondary badge-sm">Optional</div>
+                </label>
+                {speechSupported ? (
+                  <div className="space-y-4">
+                    <button
+                      onClick={toggleVoiceInput}
+                      className={`btn w-full ${
+                        listening 
+                          ? 'btn-error animate-pulse' 
+                          : 'btn-outline'
+                      }`}
+                      disabled={isProcessing}
+                    >
+                      <span className="text-lg mr-2">
+                        {listening ? '🛑' : '🎤'}
+                      </span>
+                      {listening ? 'Stop Recording' : 'Start Voice Input'}
+                    </button>
                 
-                {/* Voice Status */}
-                {listening && (
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-2 text-sm">
-                      <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                        <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                      </div>
-                      <span className="text-red-600 font-medium">Listening...</span>
-                    </div>
-                    
-                    {interimTranscript && (
-                      <div className="mt-2 p-2 bg-base-300 rounded text-xs text-base-content/80">
-                        <span className="italic">"{interimTranscript}"</span>
-                        {confidence > 0 && (
-                          <span className="ml-2 text-base-content/60">
-                            ({(confidence * 100).toFixed(0)}% confidence)
-                          </span>
+                    {/* Voice Status */}
+                    {listening && (
+                      <div className="text-center">
+                        <div className="flex items-center justify-center gap-2 text-sm">
+                          <div className="flex space-x-1">
+                            <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                            <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                          </div>
+                          <span className="text-red-600 font-medium">Listening...</span>
+                        </div>
+                        
+                        {interimTranscript && (
+                          <div className="mt-2 p-3 bg-base-300 rounded-lg text-sm text-base-content/80">
+                            <span className="italic">"{interimTranscript}"</span>
+                            {confidence > 0 && (
+                              <span className="ml-2 text-base-content/60">
+                                ({(confidence * 100).toFixed(0)}% confidence)
+                              </span>
+                            )}
+                          </div>
                         )}
                       </div>
                     )}
                   </div>
+                ) : (
+                  <div className="alert alert-warning">
+                    <span>🎤 Voice input not supported in this browser</span>
+                  </div>
+                )}
+                
+                {speechError && (
+                  <div className="alert alert-error mt-2">
+                    <span className="text-xs whitespace-pre-line">{speechError}</span>
+                  </div>
                 )}
               </div>
-            ) : (
-              <div className="alert alert-warning">
-                <span>🎤 Voice input not supported in this browser</span>
-              </div>
-            )}
-            
-            {speechError && (
-              <div className="alert alert-error mt-2">
-                <span className="text-xs whitespace-pre-line">{speechError}</span>
-              </div>
-            )}
+            </div>
           </div>
         </div>
 
         {/* Output Pane */}
-        <div className="space-y-4">
-          <div className="form-control">
-            <div className="label">
-              <span className="label-text font-semibold">Output</span>
-              {outputText && (
-                <button
-                  onClick={copyOutput}
-                  className={`btn btn-xs ${copySuccess ? 'btn-success' : 'btn-ghost'}`}
+        <div className="space-y-6">
+          <div className="card bg-base-200 shadow-lg">
+            <div className="card-body">
+              <div className="form-control">
+                <div className="label">
+                  <span className="label-text font-semibold text-lg">Output</span>
+                  {outputText && (
+                    <button
+                      onClick={copyOutput}
+                      className={`btn btn-sm ${copySuccess ? 'btn-success' : 'btn-outline'}`}
+                    >
+                      {copySuccess ? '✓ Copied!' : '📋 Copy'}
+                    </button>
+                  )}
+                </div>
+                <motion.div 
+                  className="card bg-base-100 h-80 shadow-sm border border-base-300"
+                  layout
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  {copySuccess ? '✓ Copied' : 'Copy'}
-                </button>
-              )}
-            </div>
-            <motion.div 
-              className="card bg-base-200 h-64 shadow-sm"
-              layout
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="card-body p-4">
+                  <div className="card-body p-6">
                 {isProcessing ? (
                   <motion.div 
                     className="flex items-center justify-center h-full"
@@ -329,32 +368,34 @@ const DashboardLayout: React.FC = () => {
                     className="flex items-center justify-center h-full"
                   >
                     <div className="text-center">
-                      <div className="text-4xl mb-2">✨</div>
-                      <p className="text-base-content/60 italic">
+                      <div className="text-6xl mb-4">✨</div>
+                      <p className="text-base-content/70 italic text-lg">
                         Processed text will appear here...
                       </p>
-                      <p className="text-xs text-base-content/40 mt-1">
+                      <p className="text-sm text-base-content/50 mt-2">
                         Try summarizing, cleaning, extracting tasks, or translating
                       </p>
                     </div>
                   </motion.div>
                 )}
+                  </div>
+                </motion.div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Action Buttons */}
       <motion.div 
-        className="mt-8 flex flex-wrap gap-4 justify-center"
+        className="mt-12 flex flex-wrap gap-6 justify-center"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
         <motion.button
           onClick={() => handleAction('summarize')}
-          className={`btn btn-lg shadow-md hover:shadow-lg transition-all duration-200 ${
+          className={`btn btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-40 ${
             activeAction === 'summarize' 
               ? 'btn-primary loading scale-105' 
               : 'btn-primary hover:scale-105'
@@ -368,7 +409,7 @@ const DashboardLayout: React.FC = () => {
         
         <motion.button
           onClick={() => handleAction('clean')}
-          className={`btn btn-lg shadow-md hover:shadow-lg transition-all duration-200 ${
+          className={`btn btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-40 ${
             activeAction === 'clean' 
               ? 'btn-secondary loading scale-105' 
               : 'btn-secondary hover:scale-105'
@@ -382,7 +423,7 @@ const DashboardLayout: React.FC = () => {
         
         <motion.button
           onClick={() => handleAction('tasks')}
-          className={`btn btn-lg shadow-md hover:shadow-lg transition-all duration-200 ${
+          className={`btn btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-40 ${
             activeAction === 'tasks' 
               ? 'btn-accent loading scale-105' 
               : 'btn-accent hover:scale-105'
@@ -396,7 +437,7 @@ const DashboardLayout: React.FC = () => {
         
         <motion.button
           onClick={() => handleAction('translate')}
-          className={`btn btn-lg shadow-md hover:shadow-lg transition-all duration-200 ${
+          className={`btn btn-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-40 ${
             activeAction === 'translate' 
               ? 'btn-info loading scale-105' 
               : 'btn-info hover:scale-105'
