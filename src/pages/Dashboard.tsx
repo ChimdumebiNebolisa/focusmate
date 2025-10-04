@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import DashboardLayout from '../components/DashboardLayout';
+import Footer from '../components/Footer';
 
 const Dashboard: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false);
@@ -14,7 +15,7 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-base-100 via-base-200 to-base-300 transition-all duration-500">
       <Navbar 
         onNewSession={handleNewSession}
         onHistoryClick={handleHistoryClick}
@@ -25,6 +26,7 @@ const Dashboard: React.FC = () => {
           onCloseHistory={() => setShowHistory(false)}
         />
       </main>
+      <Footer />
     </div>
   );
 };

@@ -50,7 +50,7 @@ const AboutSection: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
               viewport={{ once: true }}
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, y: -8 }}
               className="group"
             >
               <div className="card bg-base-200 shadow-xl hover:shadow-2xl transition-all duration-300 p-8 h-full border border-base-300">
@@ -75,6 +75,30 @@ const AboutSection: React.FC = () => {
             </motion.div>
           ))}
         </div>
+        
+        {/* CTA Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          viewport={{ once: true }}
+          className="text-center mt-16"
+        >
+          <h3 className="text-2xl md:text-3xl font-bold mb-4 text-base-content">
+            Ready to focus smarter?
+          </h3>
+          <p className="text-base-content/70 mb-8 max-w-2xl mx-auto">
+            Join thousands of users who are already organizing their thoughts with FocusMate
+          </p>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="btn btn-primary btn-lg shadow-xl hover:shadow-2xl transition-all duration-300"
+            onClick={() => window.location.href = '/dashboard'}
+          >
+            Get Started Now
+          </motion.button>
+        </motion.div>
       </div>
     </section>
   );

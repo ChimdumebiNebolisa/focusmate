@@ -56,8 +56,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
   const [outputText, setOutputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeAction, setActiveAction] = useState<ActionType | null>(null);
-  const [showBrowserInfo, setShowBrowserInfo] = useState(false);
-  const [saveHistory, setSaveHistory] = useState(true);
+  const [saveHistory] = useState(true);
   const [copySuccess, setCopySuccess] = useState(false);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
@@ -68,7 +67,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
     isSupported: speechSupported,
     startListening,
     stopListening,
-    resetTranscript,
     error: speechError,
     interimTranscript,
     confidence
@@ -143,11 +141,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
     }
   };
 
-  const clearAll = () => {
-    setInputText('');
-    setOutputText('');
-    resetTranscript();
-  };
 
   const copyOutput = async () => {
     try {
@@ -200,7 +193,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
           className="space-y-6"
         >
           {/* Input Card */}
-          <div className="card bg-base-100 shadow-xl rounded-2xl border border-base-300 hover:shadow-2xl transition-all duration-300">
+          <motion.div 
+            className="card bg-base-100 shadow-xl rounded-2xl border border-base-300 hover:shadow-2xl transition-all duration-300"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <div className="card-body p-8">
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-base-content mb-2">Input Text</h2>
@@ -274,7 +272,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
                 )}
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Action Toolbar */}
           <motion.div
@@ -318,7 +316,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
           className="space-y-6"
         >
           {/* Output Card */}
-          <div className="card bg-base-100 shadow-xl rounded-2xl border border-base-300 hover:shadow-2xl transition-all duration-300">
+          <motion.div 
+            className="card bg-base-100 shadow-xl rounded-2xl border border-base-300 hover:shadow-2xl transition-all duration-300"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
             <div className="card-body p-8">
               <div className="flex items-center justify-between mb-6">
                 <div>
@@ -393,10 +396,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
                 )}
               </motion.div>
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
-    </div>
 
       {/* History Panel */}
       <HistoryPanel

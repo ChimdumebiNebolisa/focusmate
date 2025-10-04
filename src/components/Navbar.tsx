@@ -92,6 +92,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNewSession, onHistoryClick }) => {
             whileTap={{ scale: 0.95 }}
           >
             <motion.div
+              className="relative"
               animate={{ 
                 rotate: [0, 10, -10, 0],
                 scale: [1, 1.1, 1]
@@ -102,11 +103,40 @@ const Navbar: React.FC<NavbarProps> = ({ onNewSession, onHistoryClick }) => {
                 repeatDelay: 3
               }}
             >
-              <Zap size={24} className="text-primary" />
+              <motion.div
+                animate={{
+                  boxShadow: [
+                    "0 0 0 0 rgba(99, 102, 241, 0.4)",
+                    "0 0 0 10px rgba(99, 102, 241, 0)",
+                    "0 0 0 0 rgba(99, 102, 241, 0)"
+                  ]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatDelay: 3
+                }}
+                className="absolute inset-0 rounded-full"
+              />
+              <Zap size={24} className="text-primary relative z-10" />
             </motion.div>
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <motion.span 
+              className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+              animate={{
+                textShadow: [
+                  "0 0 0 rgba(99, 102, 241, 0.5)",
+                  "0 0 10px rgba(99, 102, 241, 0.8)",
+                  "0 0 0 rgba(99, 102, 241, 0.5)"
+                ]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                repeatDelay: 3
+              }}
+            >
               FocusMate
-            </span>
+            </motion.span>
           </motion.div>
         </div>
 
