@@ -40,17 +40,9 @@ const LandingHero: React.FC = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-4xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight"
-            style={{
-              background: 'linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              textShadow: '0 4px 20px rgba(0,0,0,0.3)',
-              letterSpacing: '-0.02em'
-            }}
+            className="text-5xl md:text-6xl font-extrabold tracking-tight drop-shadow-md text-white"
           >
-            Organize your thoughts — instantly.
+            Organize your thoughts... instantly.
           </motion.h1>
           
           {/* Subheading */}

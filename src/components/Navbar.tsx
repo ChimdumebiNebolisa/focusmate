@@ -63,6 +63,14 @@ const Navbar: React.FC = () => {
       </div>
 
       <div className="navbar-end">
+        {/* Theme Toggle */}
+        <input
+          type="checkbox"
+          className="toggle toggle-primary mr-4"
+          onChange={() =>
+            document.documentElement.classList.toggle("dark")
+          }
+        />
         <div className="dropdown dropdown-end">
           <div
             tabIndex={0}

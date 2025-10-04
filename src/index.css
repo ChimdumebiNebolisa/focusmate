@@ -8,6 +8,10 @@
   html {
     font-family: var(--font-family-sans);
   }
+  
+  body {
+    @apply font-sans;
+  }
 }
 
 @layer components {
