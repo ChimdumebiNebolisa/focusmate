@@ -51,7 +51,7 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseHistory }) => {
-  const { user } = useAuth();
+  const { user } = useAuth(); // TypeScript should now recognize user property
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
