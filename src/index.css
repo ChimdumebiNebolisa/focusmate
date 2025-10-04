@@ -1,11 +1,12 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* Custom styles to ensure Tailwind is working */
+@theme {
+  --font-family-sans: system-ui, sans-serif;
+}
+
 @layer base {
   html {
-    font-family: system-ui, sans-serif;
+    font-family: var(--font-family-sans);
   }
 }
 
@@ -19,4 +20,34 @@
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* Hero section animations */
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradientMove 10s ease infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.6); }
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
 }
