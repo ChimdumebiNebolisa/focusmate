@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
 import { 
   summarizeText, 
@@ -166,25 +166,26 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
   };
 
   return (
-    <div className="bg-gradient-to-br from-base-100 via-base-200 to-base-300 min-h-screen">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
+    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen pt-16 px-8">
       {/* Header */}
       <motion.div 
-        className="text-center mb-12 pt-16"
+        className="text-center mb-12"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <h1 className="text-4xl md:text-5xl font-extrabold text-base-content mb-4">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 dark:text-white mb-4">
           What's on your mind today?
         </h1>
-        <p className="text-base-content/70 text-lg md:text-xl max-w-3xl mx-auto">
+        <p className="text-gray-500 dark:text-gray-300 text-lg md:text-xl max-w-3xl mx-auto mb-10">
           Let FocusMate help you summarize, clean, or translate your thoughts.
         </p>
       </motion.div>
 
-
       {/* Two Column Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto">
+
+
         {/* Left Panel - Input */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
@@ -194,83 +195,81 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
         >
           {/* Input Card */}
           <motion.div 
-            className="card bg-base-100 shadow-xl rounded-2xl border border-base-300 hover:shadow-2xl transition-all duration-300"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="card-body p-8">
-              <div className="mb-6">
-                <h2 className="text-xl font-semibold text-base-content mb-2">Input Text</h2>
-                <p className="text-sm opacity-70 mb-4">Type or use voice input to capture ideas.</p>
-              </div>
-              
-              <div className="form-control">
-                <textarea
-                  className="textarea textarea-bordered w-full h-48 resize-none text-base focus:textarea-primary shadow-inner hover:shadow-md transition-shadow duration-200 bg-base-100 rounded-xl"
-                  placeholder="Enter your text here or use voice input..."
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  disabled={isProcessing}
-                />
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-2">Input</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Type or use voice input to capture ideas.</p>
+            </div>
+            
+            <div className="relative">
+              <textarea
+                className="w-full h-48 p-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-400 bg-transparent resize-none text-gray-800 dark:text-gray-100 transition-all duration-200"
+                placeholder="Enter your text here or use voice input..."
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                disabled={isProcessing}
+              />
                 
-                {/* Voice Input Button */}
-                <div className="flex items-center justify-between mt-4">
-                  <div className="text-sm text-base-content/60">
-                    {inputText.length} characters
-                  </div>
-                  
-                  {speechSupported && (
-                    <button
-                      onClick={toggleVoiceInput}
-                      className={`btn btn-circle ${
-                        listening 
-                          ? 'btn-error animate-pulse' 
-                          : 'btn-outline'
-                      }`}
-                      disabled={isProcessing}
-                      title={listening ? 'Stop Recording' : 'Start Voice Input'}
-                    >
-                      <Mic className="w-5 h-5" />
-                    </button>
-                  )}
+              {/* Voice Input Button */}
+              <div className="flex items-center justify-between mt-4">
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  {inputText.length} characters
                 </div>
                 
-                {/* Voice Status */}
-                {listening && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    className="mt-4 p-4 bg-base-200 rounded-xl"
+                {speechSupported && (
+                  <button
+                    onClick={toggleVoiceInput}
+                    className={`p-2 rounded-full transition-all duration-200 ${
+                      listening 
+                        ? 'bg-red-500 text-white animate-pulse' 
+                        : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                    }`}
+                    disabled={isProcessing}
+                    title={listening ? 'Stop Recording' : 'Start Voice Input'}
                   >
-                    <div className="flex items-center justify-center gap-2 text-sm">
-                      <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                        <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                      </div>
-                      <span className="text-red-600 font-medium">Listening...</span>
-                    </div>
-                    
-                    {interimTranscript && (
-                      <div className="mt-3 p-3 bg-base-300 rounded-lg text-sm text-base-content/80">
-                        <span className="italic">"{interimTranscript}"</span>
-                        {confidence > 0 && (
-                          <span className="ml-2 text-base-content/60">
-                            ({(confidence * 100).toFixed(0)}% confidence)
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-                
-                {speechError && (
-                  <div className="alert alert-error mt-4">
-                    <span className="text-xs whitespace-pre-line">{speechError}</span>
-                  </div>
+                    <Mic className="w-5 h-5" />
+                  </button>
                 )}
               </div>
+                
+              {/* Voice Status */}
+              {listening && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-xl"
+                >
+                  <div className="flex items-center justify-center gap-2 text-sm">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                    </div>
+                    <span className="text-red-600 font-medium">Listening...</span>
+                  </div>
+                  
+                  {interimTranscript && (
+                    <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg text-sm text-gray-700 dark:text-gray-300">
+                      <span className="italic">"{interimTranscript}"</span>
+                      {confidence > 0 && (
+                        <span className="ml-2 text-gray-500 dark:text-gray-400">
+                          ({(confidence * 100).toFixed(0)}% confidence)
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+                
+              {speechError && (
+                <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                  <span className="text-xs text-red-600 dark:text-red-400 whitespace-pre-line">{speechError}</span>
+                </div>
+              )}
             </div>
           </motion.div>
 
@@ -279,15 +278,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="grid grid-cols-2 gap-4"
+            className="flex flex-wrap gap-4 mt-6 justify-center"
           >
             {actions.map(({ label, icon: Icon, action, color, tooltip }) => (
-              <div key={action} className="tooltip" data-tip={tooltip}>
+              <div key={action} title={tooltip}>
                 <motion.button
                   onClick={() => handleAction(action)}
-                  className={`btn btn-lg shadow-md hover:shadow-xl transition-all duration-200 rounded-full py-2 px-6 flex items-center gap-3 bg-gradient-to-r ${color} text-white border-0 ${
+                  className={`px-5 py-2 rounded-lg shadow-md hover:shadow-xl transition-all duration-200 flex items-center gap-2 bg-gradient-to-r ${color} text-white font-semibold ${
                     activeAction === action 
-                      ? 'loading scale-105' 
+                      ? 'scale-105 opacity-75' 
                       : ''
                   }`}
                   disabled={!inputText.trim() || isProcessing}
@@ -295,7 +294,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
                   whileTap={{ scale: 0.95 }}
                 >
                   {activeAction === action ? (
-                    <div className="loading loading-spinner loading-sm"></div>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   ) : (
                     <>
                       <Icon size={20} />
@@ -317,85 +316,85 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
         >
           {/* Output Card */}
           <motion.div 
-            className="card bg-base-100 shadow-xl rounded-2xl border border-base-300 hover:shadow-2xl transition-all duration-300"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <div className="card-body p-8">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-xl font-semibold text-base-content mb-2">Output</h2>
-                  <p className="text-sm opacity-70 mb-4">Your processed result will appear here.</p>
-                </div>
-                {outputText && (
-                  <button
-                    onClick={copyOutput}
-                    className={`btn btn-sm shadow-md hover:shadow-lg transition-all duration-200 rounded-xl ${
-                      copySuccess ? 'btn-success' : 'btn-outline'
-                    }`}
-                  >
-                    {copySuccess ? '✓ Copied!' : '📋 Copy'}
-                  </button>
-                )}
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-2">Output</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Your processed result will appear here.</p>
               </div>
-              
-              <motion.div 
-                className="bg-base-200 h-80 rounded-xl p-6 overflow-y-auto"
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.2 }}
-              >
-                {isProcessing ? (
-                  <motion.div 
-                    className="flex items-center justify-center h-full"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <div className="flex flex-col items-center gap-4">
-                      <div className="loading loading-spinner loading-lg text-primary"></div>
-                      <div className="text-center">
-                        <p className="text-base-content/80 font-medium text-lg">
-                          {activeAction ? `Processing ${activeAction}...` : 'Processing...'}
-                        </p>
-                        <p className="text-sm text-base-content/60 mt-1">
-                          Using Chrome AI
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
-                ) : outputText ? (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="h-full overflow-y-auto"
-                  >
-                    <p className="text-base-content whitespace-pre-wrap leading-relaxed text-base">
-                      {outputText}
-                    </p>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex items-center justify-center h-full"
-                  >
-                    <div className="text-center">
-                      <div className="text-6xl mb-4">✨</div>
-                      <p className="text-base-content/70 italic text-lg">
-                        Processed text will appear here...
-                      </p>
-                      <p className="text-sm text-base-content/50 mt-2">
-                        Try summarizing, cleaning, extracting tasks, or translating
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
-              </motion.div>
+              {outputText && (
+                <button
+                  onClick={copyOutput}
+                  className={`px-3 py-1 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 text-sm font-medium ${
+                    copySuccess 
+                      ? 'bg-green-500 text-white' 
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  {copySuccess ? '✓ Copied!' : '📋 Copy'}
+                </button>
+              )}
             </div>
+              
+            <motion.div 
+              className="bg-gray-100 dark:bg-gray-700 h-80 rounded-xl p-6 overflow-y-auto"
+              layout
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.2 }}
+            >
+              {isProcessing ? (
+                <motion.div 
+                  className="flex items-center justify-center h-full"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="text-center">
+                      <p className="text-gray-700 dark:text-gray-300 font-medium text-lg">
+                        {activeAction ? `Processing ${activeAction}...` : 'Processing...'}
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        Using Chrome AI
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              ) : outputText ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="h-full overflow-y-auto"
+                >
+                  <p className="text-gray-800 dark:text-gray-100 whitespace-pre-wrap leading-relaxed text-base">
+                    {outputText}
+                  </p>
+                </motion.div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex items-center justify-center h-full"
+                >
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">✨</div>
+                    <p className="text-gray-500 dark:text-gray-400 italic text-lg">
+                      Results will appear here
+                    </p>
+                    <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+                      Try summarizing, cleaning, extracting tasks, or translating
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
           </motion.div>
         </motion.div>
       </div>
@@ -416,7 +415,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
             exit={{ opacity: 0, y: 50, scale: 0.9 }}
             className="fixed bottom-4 right-4 z-50"
           >
-            <div className="alert alert-success shadow-lg">
+            <div className="bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg">
               <div className="flex items-center gap-2">
                 <span className="text-lg">✅</span>
                 <span className="font-medium">{successMessage}</span>

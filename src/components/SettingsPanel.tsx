@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 const SettingsPanel: React.FC = () => {
   const { user } = useAuth();
@@ -11,7 +11,7 @@ const SettingsPanel: React.FC = () => {
     notifications: true,
   });
 
-  const handleSettingChange = (key: string, value: any) => {
+  const handleSettingChange = (key: string, value: string | boolean) => {
     setSettings(prev => ({
       ...prev,
       [key]: value

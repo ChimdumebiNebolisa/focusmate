@@ -15,7 +15,7 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-base-100 via-base-200 to-base-300 transition-all duration-500">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-all duration-500">
       <Navbar 
         onNewSession={handleNewSession}
         onHistoryClick={handleHistoryClick}

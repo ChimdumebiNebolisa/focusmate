@@ -7,7 +7,7 @@ import { AuthProvider } from "./context/AuthContext";
 
 function App() {
   return (
-    <div data-theme="light">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <AuthProvider>
         <BrowserRouter>
           <Routes>

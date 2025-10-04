@@ -25,7 +25,7 @@ const AboutSection: React.FC = () => {
   ];
 
   return (
-    <section id="about-section" className="py-20 bg-base-100">
+    <section id="about-section" className="py-20 bg-white dark:bg-gray-900">
       <div className="container mx-auto px-4 max-w-6xl">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -34,10 +34,10 @@ const AboutSection: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-800 dark:text-white">
             What FocusMate Does
           </h2>
-          <p className="text-lg text-base-content/70 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">
             Transform your thoughts into organized, actionable content with AI-powered tools
           </p>
         </motion.div>
@@ -53,8 +53,8 @@ const AboutSection: React.FC = () => {
               whileHover={{ scale: 1.05, y: -8 }}
               className="group"
             >
-              <div className="card bg-base-200 shadow-xl hover:shadow-2xl transition-all duration-300 p-8 h-full border border-base-300">
-                <div className="card-body items-center text-center">
+              <div className="bg-gray-100 dark:bg-gray-800 shadow-xl hover:shadow-2xl transition-all duration-300 p-8 h-full border border-gray-200 dark:border-gray-700 rounded-2xl">
+                <div className="flex flex-col items-center text-center h-full">
                   <motion.div
                     whileHover={{ rotate: 360 }}
                     transition={{ duration: 0.6 }}
@@ -63,11 +63,11 @@ const AboutSection: React.FC = () => {
                     <feature.icon className="w-8 h-8 text-white" />
                   </motion.div>
                   
-                  <h3 className="card-title text-xl font-bold mb-4 text-base-content">
+                  <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">
                     {feature.title}
                   </h3>
                   
-                  <p className="text-base-content/70 leading-relaxed">
+                  <p className="text-gray-500 dark:text-gray-300 leading-relaxed">
                     {feature.desc}
                   </p>
                 </div>
@@ -84,16 +84,16 @@ const AboutSection: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mt-16"
         >
-          <h3 className="text-2xl md:text-3xl font-bold mb-4 text-base-content">
+          <h3 className="text-2xl md:text-3xl font-bold mb-4 text-gray-800 dark:text-white">
             Ready to focus smarter?
           </h3>
-          <p className="text-base-content/70 mb-8 max-w-2xl mx-auto">
+          <p className="text-gray-500 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
             Join thousands of users who are already organizing their thoughts with FocusMate
           </p>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="btn btn-primary btn-lg shadow-xl hover:shadow-2xl transition-all duration-300"
+            className="px-8 py-3 bg-indigo-500 text-white font-semibold rounded-lg shadow-xl hover:shadow-2xl hover:bg-indigo-600 transition-all duration-300"
             onClick={() => window.location.href = '/dashboard'}
           >
             Get Started Now

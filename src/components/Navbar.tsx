@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { Menu, LogOut, Settings, Zap, History, Plus, Sun, Moon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -10,7 +10,7 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ onNewSession, onHistoryClick }) => {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
@@ -39,94 +39,79 @@ const Navbar: React.FC<NavbarProps> = ({ onNewSession, onHistoryClick }) => {
   };
 
   const toggleTheme = () => {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', newTheme);
-    setIsDark(newTheme === 'dark');
+    document.documentElement.classList.toggle('dark');
+    setIsDark(!isDark);
   };
 
   return (
-    <nav className="navbar fixed top-0 z-50 bg-base-100/80 backdrop-blur-md shadow-lg border-b border-base-300">
-      <div className="max-w-7xl mx-auto w-full px-8">
-        <div className="navbar-start">
-          {/* Mobile Menu */}
-          <div className="dropdown lg:hidden">
-            <div tabIndex={0} role="button" className="btn btn-ghost">
-              <Menu className="w-5 h-5" />
+    <nav className="fixed top-0 left-0 w-full bg-white/70 dark:bg-gray-900/70 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 shadow-sm flex justify-between items-center px-8 py-3 z-50">
+      <div className="flex items-center gap-4">
+        {/* Mobile Menu */}
+        <div className="lg:hidden relative">
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+          {isMenuOpen && (
+            <div className="absolute top-full left-0 mt-2 w-52 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-2">
+              <button 
+                onClick={() => {handleNewSession(); setIsMenuOpen(false);}} 
+                className="w-full flex items-center gap-2 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                New Session
+              </button>
+              <button 
+                onClick={() => {handleHistoryClick(); setIsMenuOpen(false);}} 
+                className="w-full flex items-center gap-2 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <History className="w-4 h-4" />
+                History
+              </button>
+              <button 
+                onClick={() => {navigate('/settings'); setIsMenuOpen(false);}} 
+                className="w-full flex items-center gap-2 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <Settings className="w-4 h-4" />
+                Settings
+              </button>
+              <button 
+                onClick={() => {handleLogout(); setIsMenuOpen(false);}} 
+                className="w-full flex items-center gap-2 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-red-600 dark:text-red-400"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
             </div>
-            <ul
-              tabIndex={0}
-              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-xl bg-base-100 rounded-box w-52 border border-base-300"
-            >
-              <li>
-                <button onClick={handleNewSession} className="flex items-center gap-2">
-                  <Plus className="w-4 h-4" />
-                  New Session
-                </button>
-              </li>
-              <li>
-                <button onClick={handleHistoryClick} className="flex items-center gap-2">
-                  <History className="w-4 h-4" />
-                  History
-                </button>
-              </li>
-              <li>
-                <button onClick={() => navigate('/settings')} className="flex items-center gap-2">
-                  <Settings className="w-4 h-4" />
-                  Settings
-                </button>
-              </li>
-              <li>
-                <button onClick={handleLogout} className="flex items-center gap-2 text-error">
-                  <LogOut className="w-4 h-4" />
-                  Logout
-                </button>
-              </li>
-            </ul>
-          </div>
+          )}
+        </div>
 
-          {/* Logo */}
-          <motion.div 
-            className="flex items-center gap-2"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+        {/* Logo */}
+        <motion.div 
+          className="flex items-center gap-2"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <motion.div
+            className="relative"
+            animate={{ 
+              rotate: [0, 10, -10, 0],
+              scale: [1, 1.1, 1]
+            }}
+            transition={{ 
+              duration: 2,
+              repeat: Infinity,
+              repeatDelay: 3
+            }}
           >
             <motion.div
-              className="relative"
-              animate={{ 
-                rotate: [0, 10, -10, 0],
-                scale: [1, 1.1, 1]
-              }}
-              transition={{ 
-                duration: 2,
-                repeat: Infinity,
-                repeatDelay: 3
-              }}
-            >
-              <motion.div
-                animate={{
-                  boxShadow: [
-                    "0 0 0 0 rgba(99, 102, 241, 0.4)",
-                    "0 0 0 10px rgba(99, 102, 241, 0)",
-                    "0 0 0 0 rgba(99, 102, 241, 0)"
-                  ]
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  repeatDelay: 3
-                }}
-                className="absolute inset-0 rounded-full"
-              />
-              <Zap size={24} className="text-primary relative z-10" />
-            </motion.div>
-            <motion.span 
-              className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
               animate={{
-                textShadow: [
-                  "0 0 0 rgba(99, 102, 241, 0.5)",
-                  "0 0 10px rgba(99, 102, 241, 0.8)",
-                  "0 0 0 rgba(99, 102, 241, 0.5)"
+                boxShadow: [
+                  "0 0 0 0 rgba(99, 102, 241, 0.4)",
+                  "0 0 0 10px rgba(99, 102, 241, 0)",
+                  "0 0 0 0 rgba(99, 102, 241, 0)"
                 ]
               }}
               transition={{
@@ -134,68 +119,85 @@ const Navbar: React.FC<NavbarProps> = ({ onNewSession, onHistoryClick }) => {
                 repeat: Infinity,
                 repeatDelay: 3
               }}
-            >
-              FocusMate
-            </motion.span>
+              className="absolute inset-0 rounded-full"
+            />
+            <Zap size={24} className="text-indigo-600 dark:text-indigo-400 relative z-10" />
           </motion.div>
+          <motion.span 
+            className="text-xl font-bold text-indigo-600 dark:text-indigo-400"
+            animate={{
+              textShadow: [
+                "0 0 0 rgba(99, 102, 241, 0.5)",
+                "0 0 10px rgba(99, 102, 241, 0.8)",
+                "0 0 0 rgba(99, 102, 241, 0.5)"
+              ]
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              repeatDelay: 3
+            }}
+          >
+            FocusMate
+          </motion.span>
+        </motion.div>
+      </div>
+
+      <div className="flex items-center gap-4">
+        {/* Desktop Buttons */}
+        <div className="hidden lg:flex items-center gap-2">
+          <button
+            onClick={handleNewSession}
+            className="px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            New Session
+          </button>
+          
+          <button
+            onClick={handleHistoryClick}
+            className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+          >
+            <History className="w-4 h-4" />
+            History
+          </button>
+          
+          <button
+            onClick={() => navigate('/settings')}
+            className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+          >
+            <Settings className="w-4 h-4" />
+            Settings
+          </button>
+
+          {/* Theme Toggle */}
+          <button
+            className="px-3 py-2 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+            onClick={toggleTheme}
+            title="Toggle theme"
+          >
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+
+          {/* Logout */}
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
         </div>
 
-        <div className="navbar-end">
-          {/* Desktop Buttons */}
-          <div className="hidden lg:flex items-center gap-2">
-            <button
-              onClick={handleNewSession}
-              className="btn btn-primary btn-sm shadow-lg hover:shadow-xl transition-all duration-200"
-            >
-              <Plus className="w-4 h-4" />
-              New Session
-            </button>
-            
-            <button
-              onClick={handleHistoryClick}
-              className="btn btn-ghost btn-sm shadow-lg hover:shadow-xl transition-all duration-200"
-            >
-              <History className="w-4 h-4" />
-              History
-            </button>
-            
-            <button
-              onClick={() => navigate('/settings')}
-              className="btn btn-ghost btn-sm shadow-lg hover:shadow-xl transition-all duration-200"
-            >
-              <Settings className="w-4 h-4" />
-              Settings
-            </button>
-
-            {/* Theme Toggle */}
-            <button
-              className="btn btn-ghost btn-circle btn-sm"
-              onClick={toggleTheme}
-              title="Toggle theme"
-            >
-              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
-
-            {/* Logout */}
-            <button
-              onClick={handleLogout}
-              className="btn btn-error btn-sm shadow-lg hover:shadow-xl transition-all duration-200"
-            >
-              <LogOut className="w-4 h-4" />
-              Logout
-            </button>
-          </div>
-
-          {/* Mobile Theme Toggle */}
-          <div className="lg:hidden">
-            <button
-              className="btn btn-ghost btn-circle btn-sm"
-              onClick={toggleTheme}
-              title="Toggle theme"
-            >
-              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
-          </div>
+        {/* Mobile Theme Toggle */}
+        <div className="lg:hidden">
+          <button
+            className="px-3 py-2 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+            onClick={toggleTheme}
+            title="Toggle theme"
+          >
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
         </div>
       </div>
     </nav>

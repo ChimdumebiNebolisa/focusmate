@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
   html {
@@ -11,26 +13,13 @@
   }
 }
 
-@layer components {
-  .btn-custom {
-    padding: 0.5rem 1rem;
-    background-color: rgb(59 130 246);
-    color: white;
-    border-radius: 0.25rem;
-  }
-  
-  .btn-custom:hover {
-    background-color: rgb(37 99 235);
-  }
-}
-
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
 }
 
-/* Hero section animations */
+/* Custom animations for enhanced visual effects */
 @keyframes gradientMove {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -52,8 +41,8 @@
 }
 
 @keyframes glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
-  50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.6); }
+  0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.6); }
 }
 
 .animate-glow {
