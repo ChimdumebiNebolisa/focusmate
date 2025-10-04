@@ -15,10 +15,34 @@ import { Mic, Brain, Sparkles, CheckSquare, Globe } from 'lucide-react';
 type ActionType = 'summarize' | 'clean' | 'tasks' | 'translate';
 
 const actions = [
-  { label: 'Summarize', icon: Brain, action: 'summarize' as ActionType, color: 'from-indigo-500 to-purple-600' },
-  { label: 'Clean', icon: Sparkles, action: 'clean' as ActionType, color: 'from-emerald-500 to-teal-600' },
-  { label: 'Extract Tasks', icon: CheckSquare, action: 'tasks' as ActionType, color: 'from-orange-500 to-red-600' },
-  { label: 'Translate', icon: Globe, action: 'translate' as ActionType, color: 'from-blue-500 to-cyan-600' },
+  { 
+    label: 'Summarize', 
+    icon: Brain, 
+    action: 'summarize' as ActionType, 
+    color: 'from-indigo-500 to-purple-600',
+    tooltip: 'Generate a clean summary of your text.'
+  },
+  { 
+    label: 'Clean', 
+    icon: Sparkles, 
+    action: 'clean' as ActionType, 
+    color: 'from-emerald-500 to-teal-600',
+    tooltip: 'Fix grammar, tone, and readability.'
+  },
+  { 
+    label: 'Extract Tasks', 
+    icon: CheckSquare, 
+    action: 'tasks' as ActionType, 
+    color: 'from-orange-500 to-red-600',
+    tooltip: 'Identify actionable items from your notes.'
+  },
+  { 
+    label: 'Translate', 
+    icon: Globe, 
+    action: 'translate' as ActionType, 
+    color: 'from-blue-500 to-cyan-600',
+    tooltip: 'Translate your text to another language.'
+  },
 ];
 
 interface DashboardLayoutProps {
@@ -149,25 +173,25 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-8 py-6">
+    <div className="bg-gradient-to-br from-base-100 via-base-200 to-base-300 min-h-screen">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
       {/* Header */}
       <motion.div 
-        className="text-center mb-12"
+        className="text-center mb-12 pt-16"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-base-content mb-4">
-          Transform your thoughts into clarity.
+        <h1 className="text-4xl md:text-5xl font-extrabold text-base-content mb-4">
+          What's on your mind today?
         </h1>
         <p className="text-base-content/70 text-lg md:text-xl max-w-3xl mx-auto">
-          Your AI assistant for cleaning, summarizing, and translating content.
+          Let FocusMate help you summarize, clean, or translate your thoughts.
         </p>
       </motion.div>
 
 
       {/* Two Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Panel - Input */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
@@ -179,8 +203,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
           <div className="card bg-base-100 shadow-xl rounded-2xl border border-base-300 hover:shadow-2xl transition-all duration-300">
             <div className="card-body p-8">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-base-content mb-2">Input Text</h2>
-                <p className="text-base-content/70">Type or use voice input to capture ideas.</p>
+                <h2 className="text-xl font-semibold text-base-content mb-2">Input Text</h2>
+                <p className="text-sm opacity-70 mb-4">Type or use voice input to capture ideas.</p>
               </div>
               
               <div className="form-control">
@@ -259,28 +283,29 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
             transition={{ duration: 0.5, delay: 0.2 }}
             className="grid grid-cols-2 gap-4"
           >
-            {actions.map(({ label, icon: Icon, action, color }) => (
-              <motion.button
-                key={action}
-                onClick={() => handleAction(action)}
-                className={`btn btn-lg shadow-xl hover:shadow-2xl transition-all duration-200 rounded-2xl flex items-center gap-3 bg-gradient-to-r ${color} text-white border-0 ${
-                  activeAction === action 
-                    ? 'loading scale-105' 
-                    : 'hover:scale-105'
-                }`}
-                disabled={!inputText.trim() || isProcessing}
-                whileHover={{ scale: activeAction !== action ? 1.05 : 1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {activeAction === action ? (
-                  <div className="loading loading-spinner loading-sm"></div>
-                ) : (
-                  <>
-                    <Icon size={20} />
-                    <span className="text-sm font-medium">{label}</span>
-                  </>
-                )}
-              </motion.button>
+            {actions.map(({ label, icon: Icon, action, color, tooltip }) => (
+              <div key={action} className="tooltip" data-tip={tooltip}>
+                <motion.button
+                  onClick={() => handleAction(action)}
+                  className={`btn btn-lg shadow-md hover:shadow-xl transition-all duration-200 rounded-full py-2 px-6 flex items-center gap-3 bg-gradient-to-r ${color} text-white border-0 ${
+                    activeAction === action 
+                      ? 'loading scale-105' 
+                      : ''
+                  }`}
+                  disabled={!inputText.trim() || isProcessing}
+                  whileHover={{ scale: activeAction !== action ? 1.05 : 1, filter: "brightness(1.2)" }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {activeAction === action ? (
+                    <div className="loading loading-spinner loading-sm"></div>
+                  ) : (
+                    <>
+                      <Icon size={20} />
+                      <span className="text-sm font-medium">{label}</span>
+                    </>
+                  )}
+                </motion.button>
+              </div>
             ))}
           </motion.div>
         </motion.div>
@@ -297,8 +322,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
             <div className="card-body p-8">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-base-content mb-2">Output</h2>
-                  <p className="text-base-content/70">Your processed result will appear here.</p>
+                  <h2 className="text-xl font-semibold text-base-content mb-2">Output</h2>
+                  <p className="text-sm opacity-70 mb-4">Your processed result will appear here.</p>
                 </div>
                 {outputText && (
                   <button
@@ -371,6 +396,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
           </div>
         </motion.div>
       </div>
+    </div>
 
       {/* History Panel */}
       <HistoryPanel

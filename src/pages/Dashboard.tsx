@@ -14,12 +14,12 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-base-100 to-base-200">
+    <div className="min-h-screen">
       <Navbar 
         onNewSession={handleNewSession}
         onHistoryClick={handleHistoryClick}
       />
-      <main className="pt-20">
+      <main>
         <DashboardLayout 
           showHistory={showHistory}
           onCloseHistory={() => setShowHistory(false)}
