@@ -75,6 +75,7 @@ const LandingHero: React.FC = () => {
             transition={{ duration: 0.8, delay: 0.8 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            className="mb-16 md:mb-20"
           >
             <div className="relative inline-block">
               <div className="absolute inset-0 bg-white/20 rounded-xl blur-xl animate-glow" />
@@ -100,34 +101,35 @@ const LandingHero: React.FC = () => {
         </motion.div>
       </div>
       
-      {/* Scroll down button */}
+      {/* Scroll down button - mobile friendly */}
       <motion.button
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 1.5 }}
-        whileHover={{ scale: 1.1 }}
+        whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={scrollToAbout}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3 text-white hover:bg-white/20 transition-all duration-300 group"
+        className="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2 z-20 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-2 md:px-6 md:py-3 text-white hover:bg-white/20 transition-all duration-300 group"
         style={{
           textShadow: '0 2px 10px rgba(0,0,0,0.3)'
         }}
       >
         <div className="flex flex-col items-center space-y-1">
-          <span className="text-sm font-medium">What does FocusMate do?</span>
+          <span className="text-xs md:text-sm font-medium hidden sm:block">What does FocusMate do?</span>
+          <span className="text-xs font-medium sm:hidden">Learn more</span>
           <motion.div
             animate={{ y: [0, 4, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
             className="text-white/80"
           >
             <svg 
-              width="16" 
-              height="16" 
+              width="14" 
+              height="14" 
               viewBox="0 0 24 24" 
               fill="none" 
               stroke="currentColor" 
               strokeWidth="2"
-              className="group-hover:text-white transition-colors duration-300"
+              className="group-hover:text-white transition-colors duration-300 md:w-4 md:h-4"
             >
               <path d="M12 5v14M19 12l-7 7-7-7" />
             </svg>
