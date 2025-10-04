@@ -100,18 +100,19 @@ const LandingHero: React.FC = () => {
       </div>
       
       {/* Scroll down button - mobile friendly */}
-      <motion.button
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 1.5 }}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={scrollToAbout}
-        className="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2 z-20 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-2 md:px-6 md:py-3 text-white hover:bg-white/20 transition-all duration-300 group"
-        style={{
-          textShadow: '0 2px 10px rgba(0,0,0,0.3)'
-        }}
-      >
+      <div className="absolute bottom-4 md:bottom-8 w-full flex justify-center z-20">
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.5 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={scrollToAbout}
+          className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-2 md:px-6 md:py-3 text-white hover:bg-white/20 transition-all duration-300 group min-w-max"
+          style={{
+            textShadow: '0 2px 10px rgba(0,0,0,0.3)'
+          }}
+        >
         <div className="flex flex-col items-center space-y-1">
           <span className="text-xs md:text-sm font-medium hidden sm:block">What does FocusMate do?</span>
           <span className="text-xs font-medium sm:hidden">Learn more</span>
@@ -133,7 +134,8 @@ const LandingHero: React.FC = () => {
             </svg>
           </motion.div>
         </div>
-      </motion.button>
+        </motion.button>
+      </div>
     </div>
   );
 };
