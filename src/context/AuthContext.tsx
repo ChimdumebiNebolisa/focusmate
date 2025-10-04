@@ -4,9 +4,9 @@ import { signInWithPopup, signOut, onAuthStateChanged, User } from "firebase/aut
 
 interface AuthContextType {
   user: User | null;
-  login: () => Promise<void>;
-  logout: () => Promise<void>;
   loading: boolean;
+  loginWithGoogle(): Promise<void>;
+  logout(): Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -15,7 +15,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const login = async () => {
+  const loginWithGoogle = async () => {
     try {
       await signInWithPopup(auth, provider);
     } catch (error) {
@@ -42,7 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, loading, loginWithGoogle, logout }}>
       {children}
     </AuthContext.Provider>
   );
