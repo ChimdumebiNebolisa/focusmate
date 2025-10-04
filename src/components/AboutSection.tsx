@@ -20,7 +20,7 @@ const AboutSection: React.FC = () => {
   ];
 
   return (
-    <section className="py-20 bg-base-100 text-center">
+    <section id="about-section" className="py-20 bg-base-100 text-center">
       <h2 className="text-3xl md:text-4xl font-bold mb-12">What FocusMate Does</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
         {features.map((f, i) => (

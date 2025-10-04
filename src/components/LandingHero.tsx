@@ -4,6 +4,16 @@ import GoogleButton from './GoogleButton';
 import ParticleBackground from './ParticleBackground';
 
 const LandingHero: React.FC = () => {
+  const scrollToAbout = () => {
+    const aboutSection = document.getElementById('about-section');
+    if (aboutSection) {
+      aboutSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
   return (
     <div className="relative min-h-screen overflow-hidden">
       {/* Base gradient background */}
@@ -89,6 +99,41 @@ const LandingHero: React.FC = () => {
           />
         </motion.div>
       </div>
+      
+      {/* Scroll down button */}
+      <motion.button
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 1.5 }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={scrollToAbout}
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3 text-white hover:bg-white/20 transition-all duration-300 group"
+        style={{
+          textShadow: '0 2px 10px rgba(0,0,0,0.3)'
+        }}
+      >
+        <div className="flex flex-col items-center space-y-1">
+          <span className="text-sm font-medium">What does FocusMate do?</span>
+          <motion.div
+            animate={{ y: [0, 4, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            className="text-white/80"
+          >
+            <svg 
+              width="16" 
+              height="16" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2"
+              className="group-hover:text-white transition-colors duration-300"
+            >
+              <path d="M12 5v14M19 12l-7 7-7-7" />
+            </svg>
+          </motion.div>
+        </div>
+      </motion.button>
     </div>
   );
 };
