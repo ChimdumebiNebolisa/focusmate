@@ -40,7 +40,7 @@ const LandingHero: React.FC = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-5xl md:text-6xl font-extrabold tracking-tight drop-shadow-md text-white"
+            className="text-5xl md:text-6xl font-extrabold tracking-tight drop-shadow-md text-white mb-8"
           >
             Organize your thoughts... instantly.
           </motion.h1>
@@ -55,7 +55,7 @@ const LandingHero: React.FC = () => {
               textShadow: '0 2px 10px rgba(0,0,0,0.3)'
             }}
           >
-            FocusMate cleans, summarizes, and translates your ideas with Chrome's on-device AI.
+            FocusMate turns your messy thoughts into clear, actionable ideas — instantly.
           </motion.p>
           
           {/* CTA Button */}
