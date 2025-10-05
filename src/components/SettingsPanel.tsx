@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useTheme } from '../context/ThemeContext';
+import { Sun, Moon } from 'lucide-react';
 
 const SettingsPanel: React.FC = () => {
   const { user } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const [settings, setSettings] = useState({
-    theme: 'light',
     language: 'en',
     voiceMode: true,
     autoSave: true,
@@ -21,13 +23,13 @@ const SettingsPanel: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-6">Settings</h2>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Settings</h2>
 
       <div className="space-y-6">
         {/* User Profile */}
-        <div className="border-b border-gray-200 pb-6">
-          <h3 className="text-md font-medium text-gray-900 mb-4">Profile</h3>
+        <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+          <h3 className="text-md font-medium text-gray-900 dark:text-white mb-4">Profile</h3>
           <div className="flex items-center space-x-4">
             <img
               src={user?.photoURL || ''}
@@ -35,39 +37,54 @@ const SettingsPanel: React.FC = () => {
               className="w-16 h-16 rounded-full"
             />
             <div>
-              <p className="text-sm font-medium text-gray-900">{user?.displayName}</p>
-              <p className="text-sm text-gray-500">{user?.email}</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.displayName}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{user?.email}</p>
             </div>
           </div>
         </div>
 
         {/* Appearance */}
-        <div className="border-b border-gray-200 pb-6">
-          <h3 className="text-md font-medium text-gray-900 mb-4">Appearance</h3>
+        <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+          <h3 className="text-md font-medium text-gray-900 dark:text-white mb-4">Appearance</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Theme
               </label>
-              <select
-                value={settings.theme}
-                onChange={(e) => handleSettingChange('theme', e.target.value)}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-                <option value="auto">Auto</option>
-              </select>
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={toggleTheme}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+                    !isDark 
+                      ? 'bg-blue-500 text-white' 
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  <Sun className="w-4 h-4" />
+                  <span>Light</span>
+                </button>
+                <button
+                  onClick={toggleTheme}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+                    isDark 
+                      ? 'bg-blue-500 text-white' 
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  <Moon className="w-4 h-4" />
+                  <span>Dark</span>
+                </button>
+              </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Language
               </label>
               <select
                 value={settings.language}
                 onChange={(e) => handleSettingChange('language', e.target.value)}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="en">English</option>
                 <option value="es">Spanish</option>

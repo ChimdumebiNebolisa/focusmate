@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { useTheme } from '../context/ThemeContext';
 import { Menu, LogOut, Settings, Zap, History, Plus, Sun, Moon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -11,15 +12,16 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ onNewSession, onHistoryClick }) => {
   const { logout } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDark, setIsDark] = useState(false);
 
   const handleLogout = async () => {
     try {
       // Switch to light mode before logout
-      document.documentElement.classList.remove('dark');
-      setIsDark(false);
+      if (isDark) {
+        toggleTheme();
+      }
       
       await logout();
       navigate('/');
@@ -41,10 +43,6 @@ const Navbar: React.FC<NavbarProps> = ({ onNewSession, onHistoryClick }) => {
     }
   };
 
-  const toggleTheme = () => {
-    document.documentElement.classList.toggle('dark');
-    setIsDark(!isDark);
-  };
 
   return (
     <nav className="fixed top-0 left-0 w-full bg-white/70 dark:bg-gray-900/70 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 shadow-sm flex justify-between items-center px-8 py-3 z-50">
