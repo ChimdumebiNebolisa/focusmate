@@ -19,9 +19,6 @@ const LandingHero: React.FC = () => {
       {/* Particle network background */}
       <ParticleBackground />
       
-      {/* Subtle overlay for better text readability */}
-      <div className="absolute inset-0 bg-black/10" />
-      
       {/* Main content */}
       <div className="relative z-10 min-h-screen flex items-center justify-center px-4">
         <motion.div
@@ -75,7 +72,7 @@ const LandingHero: React.FC = () => {
             className="mb-16 md:mb-20"
           >
             <div className="relative inline-block">
-              <div className="absolute inset-0 bg-white/20 rounded-xl blur-xl animate-glow" />
+              <div className="absolute inset-0 bg-white/10 rounded-xl blur-xl animate-glow" />
               <GoogleButton />
             </div>
           </motion.div>
@@ -86,14 +83,14 @@ const LandingHero: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1.2 }}
-            className="absolute -top-20 -left-20 w-40 h-40 bg-white/10 rounded-full blur-3xl animate-float"
+            className="absolute -top-20 -left-20 w-40 h-40 bg-white/5 rounded-full blur-3xl animate-float"
             style={{ animationDelay: '0s' }}
           />
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1.4 }}
-            className="absolute -bottom-20 -right-20 w-60 h-60 bg-purple-500/20 rounded-full blur-3xl animate-float"
+            className="absolute -bottom-20 -right-20 w-60 h-60 bg-purple-500/10 rounded-full blur-3xl animate-float"
             style={{ animationDelay: '2s' }}
           />
         </motion.div>
