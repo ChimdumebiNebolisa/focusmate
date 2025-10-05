@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import LandingHero from '../components/LandingHero';
 import AboutSection from '../components/AboutSection';
 import Footer from '../components/Footer';
 
 const Landing: React.FC = () => {
+  const { user, loading } = useAuth();
+
+  // Redirect authenticated users to dashboard
+  if (!loading && user) {
+    return <Navigate to="/dashboard" replace />;
+  }
   return (
     <div className="relative min-h-screen flex flex-col">
       {/* Single animated gradient background */}

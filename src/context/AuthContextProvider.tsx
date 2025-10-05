@@ -11,7 +11,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const result = await signInWithPopup(auth, provider);
       console.log("Signed in:", result.user);
-      window.location.href = "/dashboard"; // TEMP redirect to confirm login success
+      // Let React Router handle navigation instead of forcing page reload
+      // The onAuthStateChanged listener will update the user state
+      // and the ProtectedRoute will handle navigation
     } catch (error) {
       console.error("Login failed:", error);
       throw error;
