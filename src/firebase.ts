@@ -15,8 +15,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const provider = new GoogleAuthProvider();
+
+// Configure Google provider
+provider.addScope('email');
+provider.addScope('profile');
+
 export const db = getFirestore(app);
 export default app;
 
 console.log("Firebase initialized:", app.name);
+console.log("Firebase config check:", {
+  apiKey: firebaseConfig.apiKey ? "✓ Set" : "✗ Missing",
+  authDomain: firebaseConfig.authDomain ? "✓ Set" : "✗ Missing",
+  projectId: firebaseConfig.projectId ? "✓ Set" : "✗ Missing",
+});
 

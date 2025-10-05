@@ -1,21 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 
 const GoogleButton: React.FC = () => {
   const { loginWithGoogle } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = async () => {
+    if (isLoading) return; // Prevent multiple clicks
+    
+    setIsLoading(true);
     try {
+      console.log('Google button clicked, starting sign-in...');
       await loginWithGoogle();
     } catch (error) {
       console.error('Login failed:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <button
       onClick={handleClick}
-      className="relative px-8 py-4 bg-white text-gray-900 rounded-xl font-semibold text-lg shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 hover:scale-105 active:scale-95 group overflow-hidden"
+      disabled={isLoading}
+      className={`relative px-8 py-4 bg-white text-gray-900 rounded-xl font-semibold text-lg shadow-2xl transition-all duration-300 group overflow-hidden ${
+        isLoading 
+          ? 'opacity-50 cursor-not-allowed' 
+          : 'hover:shadow-purple-500/25 hover:scale-105 active:scale-95'
+      }`}
       style={{
         backdropFilter: 'blur(10px)',
         border: '1px solid rgba(255, 255, 255, 0.2)'
@@ -49,7 +61,9 @@ const GoogleButton: React.FC = () => {
             fill="#EA4335"
           />
         </svg>
-        <span className="font-medium">Sign in with Google</span>
+        <span className="font-medium">
+          {isLoading ? 'Signing in...' : 'Sign in with Google'}
+        </span>
       </div>
     </button>
   );
