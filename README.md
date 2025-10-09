@@ -110,8 +110,6 @@ Open http://localhost:3000
 - Capture user stories and acceptance criteria to bound scope.  
 - Validate minimal feature set via quick clickable prototype.
 
---ACCOMPLISHED "user pain-point discovery" THROUGH "surveys + 10 user interviews" USING "structured interview guide" 
---ACCOMPLISHED "MVP scope definition" THROUGH "story mapping workshop" USING "MoSCoW prioritization"
 
 ---
 
@@ -122,9 +120,6 @@ Open http://localhost:3000
 - Design minimal, distraction-free UI with clear CTAs.  
 - Map API endpoints and data model.
 
---ACCOMPLISHED "session lifecycle clarity" THROUGH "sequence diagrams" USING "C4 + Mermaid modeling" 
---ACCOMPLISHED "UI consistency" THROUGH "design tokens" USING "Tailwind config + radix scale"
-
 ---
 
 ## IMPLEMENTATION
@@ -134,8 +129,6 @@ Open http://localhost:3000
 - Add auth guard and role-free permissions (MVP).  
 - Persist sessions and expose summary aggregates.
 
---ACCOMPLISHED "stable task CRUD" THROUGH "service layer abstraction" USING "repository pattern"
---ACCOMPLISHED "reliable timers" THROUGH "server-authoritative timestamps" USING "drift-compensation logic"
 
 ---
 
@@ -146,9 +139,6 @@ Open http://localhost:3000
 - E2E smoke tests for the core flow (login → start → finish).  
 - Manual QA checklist for UX fit and accessibility.
 
---ACCOMPLISHED "regression safety" THROUGH "CI test suite" USING "Vitest/Jest + Supertest"
---ACCOMPLISHED "critical path assurance" THROUGH "E2E runs on PRs" USING "Playwright"
-
 ---
 
 ## DEPLOYMENT
@@ -157,9 +147,6 @@ Open http://localhost:3000
 - Deploy backend (Render/Fly.io) and frontend (Vercel).  
 - Environment segregation: dev → preview → prod.  
 - Post-deploy smoke test and health checks.
-
---ACCOMPLISHED "repeatable releases" THROUGH "pipeline templates" USING "GitHub Actions" 
---ACCOMPLISHED "faster rollbacks" THROUGH "versioned images" USING "Docker + tags" 
 
 ---
 
@@ -170,8 +157,6 @@ Open http://localhost:3000
 - Backups for DB; rotation policies.  
 - Groom backlog; ship small improvements regularly.
 
---ACCOMPLISHED "issue visibility" THROUGH "error budget dashboard" USING "SLO tracking"  
---ACCOMPLISHED "operational resilience" THROUGH "nightly backups" USING "managed DB snapshot" 
 
 ---
 
