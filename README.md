@@ -90,7 +90,7 @@ npm run dev   # or: flask run
 # frontend
 npm run dev
 ```
-Open http://localhost:3000
+Open [here](https://focusmate-tau.vercel.app/)
 
 ---
 
