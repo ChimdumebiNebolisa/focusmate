@@ -1,123 +1,198 @@
-# FocusMate 🎯  
+# FocusMate 🎯
 
 A productivity assistant that helps users stay focused using accountability sessions, task management, and minimal distractions.
 
 ---
 
-## 🧠 Overview  
+## 🧠 Overview
 
-FocusMate pairs together accountability, timers, and task tracking to help people maintain focus during work or study sessions. It creates structured environments that encourage productive habits.  
-
----
-
-## 🚀 Features  
-
-- Task List / To-Do items with deadlines  
-- Session Timer (e.g. Pomodoro-style, adjustable durations)  
-- Distraction-limiting mode (blocks or dims certain UI elements)  
-- Session check-ins: begin and end with short status updates  
-- Theme support (light / dark mode)  
-- Optional session history & statistics dashboard  
+FocusMate pairs accountability, timers, and task tracking to help people maintain focus during work or study sessions. It creates a structured environment that encourages productive habits and measurable progress.
 
 ---
 
-## 🛠️ Tech Stack  
+## YOUR PROJECT README:
 
-| Layer       | Technologies                |
-|--------------|-----------------------------|
-| Frontend     | React, Tailwind CSS         |
-| Backend      | Node.js / Express / Flask (or your chosen stack) |
-| Database     | PostgreSQL / MongoDB / Firebase |
-| Auth & API   | JWT, OAuth, REST or GraphQL |
-| Hosting / Infra | Vercel / Netlify / Heroku / AWS |
+- Problem: staying consistent with deep work is hard without structure or accountability.  
+- Solution: a simple session‑based workflow (plan → focus → reflect) with tasks, timers, and progress logs.  
+- Users: students, developers, and professionals who want fewer distractions and better output.  
+- Outcome: increased session completion, clearer goals, and a repeatable focus ritual.
 
 ---
 
-## 📂 Project Structure  
+## 🚀 Features
+
+- Task list with due dates and priorities  
+- Session timer (Pomodoro or custom durations)  
+- Focus mode (minimal UI; optional blocker integrations)  
+- Start/End check-ins (goal + reflection)  
+- Session history and simple analytics  
+- Light/Dark theme
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technologies |
+|---|---|
+| Frontend | React, TypeScript, Tailwind CSS |
+| Backend | Node.js/Express **or** Flask (choose one) |
+| Database | PostgreSQL / Firebase |
+| Auth | JWT or OAuth |
+| Infra | Vercel / Render / Fly.io |
+| Optional | Chrome AI APIs for on-device text features |
+
+---
+
+## 📂 Project Structure
 
 ```
-├── frontend/            # UI code, React or equivalent  
-├── backend/             # API / server logic  
-├── shared/              # Shared models, types, utilities  
-├── scripts/             # Build, deployment, migration scripts  
-├── README.md  
-└── LICENSE  
+├── frontend/            # React UI
+├── backend/             # API / server logic
+├── shared/              # Shared types/utilities
+├── scripts/             # Build/deploy scripts
+├── README.md
+└── LICENSE
 ```
 
 ---
 
-## 🔧 Setup & Installation  
+## 🔧 Setup & Installation
 
-1. Clone the repository  
-   ```bash
-   git clone https://github.com/ChimdumebiNebolisa/focusmate.git
-   cd focusmate
-   ```  
-2. Setup backend  
-   ```bash
-   cd backend  
-   npm install  
-   # or `pip install -r requirements.txt` if Python  
-   ```  
-3. Setup frontend  
-   ```bash
-   cd ../frontend  
-   npm install  
-   ```  
-4. Create a `.env` file with required environment variables (e.g. `DATABASE_URL`, `JWT_SECRET`)  
-5. Run migrations (if needed)  
-6. Start backend and frontend (in separate terminals)  
-   ```bash
-   npm run dev   # or `flask run`  
-   npm start     # or `react-scripts start`  
-   ```  
+1) Clone and enter the repo  
+```bash
+git clone https://github.com/ChimdumebiNebolisa/focusmate.git
+cd focusmate
+```
+2) Backend setup  
+```bash
+cd backend
+npm install
+# or: pip install -r requirements.txt
+```
+3) Frontend setup  
+```bash
+cd ../frontend
+npm install
+```
+4) Create `.env` files (examples below)
+```
+# Backend
+DATABASE_URL=...
+JWT_SECRET=...
 
-Visit `http://localhost:3000` (or your configured port) to see the app.
-
----
-
-## 📌 Usage & Workflow  
-
-1. Register / log in  
-2. Add tasks to your session  
-3. Start a focus session (e.g. 25, 50, or custom minutes)  
-4. At session start: state your goal  
-5. Work without distractions  
-6. At session end: reflect and log your progress  
+# Frontend
+VITE_API_URL=http://localhost:5000
+```
+5) Run dev servers (separate terminals)
+```bash
+# backend
+npm run dev   # or: flask run
+# frontend
+npm run dev
+```
+Open http://localhost:3000
 
 ---
 
-## 📈 Roadmap & Future Enhancements  
+## 📌 Usage Workflow
 
-- Add analytics: weekly/monthly productivity charts  
-- Integrate calendar syncing (Google Calendar, iCal)  
-- Collaboration mode (pair or group sessions)  
-- Mobile app version  
-- Offline support & PWA capabilities  
-
----
-
-## 🤝 Contributing  
-
-Contributions are welcome! To get started:
-
-1. Fork the repo  
-2. Create a feature branch (`git checkout -b feature/name`)  
-3. Make your changes & tests  
-4. Commit & push (`git commit -m "Add feature X"`)  
-5. Open a Pull Request  
-
-Please adhere to the coding standards and include tests where possible.
+1) Log in or create an account  
+2) Add tasks for the current session  
+3) Start a timer (e.g., 25/50/custom)  
+4) Focus; avoid context switching  
+5) End session; reflect and log outcomes
 
 ---
 
-## 📝 License  
+## RECRUITEMENT GATHERING
 
-This project is licensed under the **MIT License** — see the `LICENSE` file for details.
+- Identify primary user groups (students, junior devs, indie hackers) and their friction points.  
+- Capture user stories and acceptance criteria to bound scope.  
+- Validate minimal feature set via quick clickable prototype.
+
+--ACCOMPLISHED "user pain-point discovery" THROUGH "surveys + 10 user interviews" USING "structured interview guide" 
+--ACCOMPLISHED "MVP scope definition" THROUGH "story mapping workshop" USING "MoSCoW prioritization"
 
 ---
 
-## 🙏 Acknowledgments  
+## ANALYSIS AND DESIGN
 
-- Inspiration from productivity tools & Pomodoro techniques  
-- Open-source libraries and community contributions  
+- Define system responsibilities (timer, tasks, sessions, analytics).  
+- Draft component hierarchy and state model.  
+- Design minimal, distraction-free UI with clear CTAs.  
+- Map API endpoints and data model.
+
+--ACCOMPLISHED "session lifecycle clarity" THROUGH "sequence diagrams" USING "C4 + Mermaid modeling" 
+--ACCOMPLISHED "UI consistency" THROUGH "design tokens" USING "Tailwind config + radix scale"
+
+---
+
+## IMPLEMENTATION
+
+- Build React views and reusable components.  
+- Implement REST endpoints for tasks/sessions.  
+- Add auth guard and role-free permissions (MVP).  
+- Persist sessions and expose summary aggregates.
+
+--ACCOMPLISHED "stable task CRUD" THROUGH "service layer abstraction" USING "repository pattern"
+--ACCOMPLISHED "reliable timers" THROUGH "server-authoritative timestamps" USING "drift-compensation logic"
+
+---
+
+## TESTING
+
+- Unit tests for core utilities and reducers.  
+- Integration tests for API endpoints.  
+- E2E smoke tests for the core flow (login → start → finish).  
+- Manual QA checklist for UX fit and accessibility.
+
+--ACCOMPLISHED "regression safety" THROUGH "CI test suite" USING "Vitest/Jest + Supertest"
+--ACCOMPLISHED "critical path assurance" THROUGH "E2E runs on PRs" USING "Playwright"
+
+---
+
+## DEPLOYMENT
+
+- CI/CD pipeline: lint, test, build, preview.  
+- Deploy backend (Render/Fly.io) and frontend (Vercel).  
+- Environment segregation: dev → preview → prod.  
+- Post-deploy smoke test and health checks.
+
+--ACCOMPLISHED "repeatable releases" THROUGH "pipeline templates" USING "GitHub Actions" 
+--ACCOMPLISHED "faster rollbacks" THROUGH "versioned images" USING "Docker + tags" 
+
+---
+
+## MAINTENANCE
+
+- Logging and monitoring with minimal overhead.  
+- Error reporting pipeline (Sentry/OpenTelemetry).  
+- Backups for DB; rotation policies.  
+- Groom backlog; ship small improvements regularly.
+
+--ACCOMPLISHED "issue visibility" THROUGH "error budget dashboard" USING "SLO tracking"  
+--ACCOMPLISHED "operational resilience" THROUGH "nightly backups" USING "managed DB snapshot" 
+
+---
+
+## 📈 Roadmap (Next)
+
+- Calendar sync (Google) for session planning  
+- Weekly productivity insights & streaks  
+- Team sessions (pair or group)  
+- PWA & offline mode
+
+---
+
+## 🤝 Contributing
+
+1) Fork the repo  
+2) Create a feature branch (`git checkout -b feature/name`)  
+3) Commit changes with context (`feat: add session analytics`)  
+4) Open a PR with screenshots where relevant
+
+---
+
+## 📝 License
+
+MIT — see `LICENSE`.
