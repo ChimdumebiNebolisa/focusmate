@@ -94,11 +94,29 @@ declare global {
  * @returns {boolean} true if at least one Chrome AI API is available
  */
 export function checkChromeAI(): boolean {
-  // Check if the global 'ai' or 'self.ai' exists
-  const chromeAI = (typeof ai !== 'undefined' ? ai : (self as Window & typeof globalThis).ai) as ChromeAI | undefined;
+  // Check if the global 'ai' exists on window or self
+  // Try window.ai first, then self.ai
+  const chromeAI = (window.ai || (self as Window & typeof globalThis).ai) as ChromeAI | undefined;
+  
+  // Debug logging
+  console.log('Chrome AI Detection:', {
+    windowAI: !!window.ai,
+    selfAI: !!(self as Window & typeof globalThis).ai,
+    hasAPI: !!chromeAI,
+    apis: chromeAI ? {
+      summarizer: !!chromeAI.summarizer,
+      writer: !!chromeAI.writer,
+      languageModel: !!chromeAI.languageModel,
+      translator: !!chromeAI.translator
+    } : null
+  });
   
   if (!chromeAI) {
-    showAIWarning();
+    // Only show warning once per session
+    if (!sessionStorage.getItem('ai-warning-shown')) {
+      showAIWarning();
+      sessionStorage.setItem('ai-warning-shown', 'true');
+    }
     return false;
   }
 
@@ -111,7 +129,11 @@ export function checkChromeAI(): boolean {
   const hasAnyAPI = hasSummarizer || hasWriter || hasLanguageModel || hasTranslator;
 
   if (!hasAnyAPI) {
-    showAIWarning();
+    // Only show warning once per session
+    if (!sessionStorage.getItem('ai-warning-shown')) {
+      showAIWarning();
+      sessionStorage.setItem('ai-warning-shown', 'true');
+    }
     return false;
   }
 
@@ -227,7 +249,7 @@ export function getChromeAIStatus(): {
   browser: string;
 } {
   const isChrome = navigator.userAgent.includes('Chrome') && !navigator.userAgent.includes('Edg');
-  const chromeAI = (typeof ai !== 'undefined' ? ai : (self as Window & typeof globalThis).ai) as ChromeAI | undefined;
+  const chromeAI = (window.ai || (self as Window & typeof globalThis).ai) as ChromeAI | undefined;
   
   return {
     available: checkChromeAI(),

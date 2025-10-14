@@ -10,7 +10,7 @@ import { checkChromeAI, safeChromeAICall } from './checkAI';
  * Helper to get the Chrome AI object
  */
 function getChromeAI() {
-  return (typeof ai !== 'undefined' ? ai : (self as Window & typeof globalThis).ai);
+  return window.ai || (self as Window & typeof globalThis).ai;
 }
 
 /**
