@@ -158,8 +158,8 @@
             const statusDiv = document.getElementById('apiStatus');
             statusDiv.innerHTML = '<p>Checking APIs...</p>';
 
-            // Access the global 'ai' object (NOT window.ai - that's deprecated)
-            const globalAI = (typeof ai !== 'undefined' ? ai : self.ai);
+            // Access self.ai (Chrome Built-in AI APIs)
+            const globalAI = ('ai' in self ? self.ai : undefined);
             
             const results = {
                 globalAI: !!globalAI,
@@ -215,7 +215,7 @@
             resultsDiv.innerHTML = '<p>⏳ Testing Language Model API...</p>';
 
             try {
-                const globalAI = (typeof ai !== 'undefined' ? ai : self.ai);
+                const globalAI = ('ai' in self ? self.ai : undefined);
                 const model = await globalAI.languageModel.create({
                     systemPrompt: 'You are a helpful assistant.'
                 });
@@ -232,7 +232,7 @@
             resultsDiv.innerHTML = '<p>⏳ Testing Summarizer API...</p>';
 
             try {
-                const globalAI = (typeof ai !== 'undefined' ? ai : self.ai);
+                const globalAI = ('ai' in self ? self.ai : undefined);
                 const summarizer = await globalAI.summarizer.create({
                     type: 'key-points',
                     format: 'plain-text',
@@ -251,7 +251,7 @@
             resultsDiv.innerHTML = '<p>⏳ Testing Writer API...</p>';
 
             try {
-                const globalAI = (typeof ai !== 'undefined' ? ai : self.ai);
+                const globalAI = ('ai' in self ? self.ai : undefined);
                 const writer = await globalAI.writer.create({
                     tone: 'neutral',
                     format: 'plain-text'
@@ -271,7 +271,7 @@
             resultsDiv.innerHTML = '<p>⏳ Testing Translator API...</p>';
 
             try {
-                const globalAI = (typeof ai !== 'undefined' ? ai : self.ai);
+                const globalAI = ('ai' in self ? self.ai : undefined);
                 const translator = await globalAI.translator.create({
                     sourceLanguage: 'en',
                     targetLanguage: 'es'
