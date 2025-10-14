@@ -128,10 +128,10 @@ FocusMate requires Chrome with AI features enabled for full functionality:
 2. **Enable AI Flags**
    Navigate to `chrome://flags` and enable:
    - `#optimization-guide-on-device-model`
-   - `#chrome-labs-ai`
-   - `#chrome-labs-ai-summarizer`
-   - `#chrome-labs-ai-rewriter`
-   - `#chrome-labs-ai-translator`
+   - `#prompt-api-for-gemini-nano`
+   - `#summarization-api-for-gemini-nano`
+   - `#writer-api-for-gemini-nano`
+   - `#translation-api`
 
 3. **Restart Chrome**
    - Close all Chrome windows
@@ -139,7 +139,8 @@ FocusMate requires Chrome with AI features enabled for full functionality:
 
 4. **Verify Setup**
    - Open Chrome DevTools
-   - Check if `window.ai` is available in the console
+   - Check if `ai.languageModel`, `ai.summarizer`, `ai.writer`, or `ai.translator` are available in the console
+   - Note: The old `window.ai` API is deprecated; use the new Chrome Built-in AI APIs
 
 ## 📱 Usage
 
@@ -247,10 +248,11 @@ npm run lint         # Run ESLint
 ### Common Issues
 
 #### Chrome AI Not Working
-- Ensure you're using Chrome Canary/Dev
-- Check that AI flags are enabled
-- Verify `window.ai` exists in DevTools console
-- Try refreshing the page
+- Ensure you're using Chrome Canary/Dev (version 127+)
+- Check that AI flags are enabled (see Chrome AI Setup section)
+- Verify `ai.languageModel`, `ai.summarizer`, `ai.writer`, or `ai.translator` exist in DevTools console
+- Note: `window.ai` is deprecated - the app now uses the new Chrome Built-in AI APIs
+- Try refreshing the page and clearing browser cache
 
 #### Voice Input Issues
 - Grant microphone permissions

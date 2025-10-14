@@ -1,35 +1,92 @@
 /**
  * Chrome AI Runtime Check Utility
  * Provides runtime validation for Chrome AI API availability
+ * Updated to use the new Chrome Built-in AI APIs (non-deprecated)
  */
 
+interface AILanguageModel {
+  prompt(input: string, options?: { systemPrompt?: string }): Promise<string>;
+  promptStreaming?(input: string, options?: { systemPrompt?: string }): ReadableStream;
+  destroy?(): void;
+}
+
+interface AILanguageModelFactory {
+  capabilities(): Promise<{
+    available: 'readily' | 'after-download' | 'no';
+  }>;
+  create(options?: {
+    systemPrompt?: string;
+    temperature?: number;
+    topK?: number;
+  }): Promise<AILanguageModel>;
+}
+
+interface AISummarizer {
+  summarize(input: string, options?: { context?: string; type?: 'tl;dr' | 'key-points' | 'teaser' | 'headline' }): Promise<string>;
+  summarizeStreaming?(input: string, options?: { context?: string }): ReadableStream;
+  destroy?(): void;
+}
+
+interface AISummarizerFactory {
+  capabilities(): Promise<{
+    available: 'readily' | 'after-download' | 'no';
+  }>;
+  create(options?: {
+    type?: 'tl;dr' | 'key-points' | 'teaser' | 'headline';
+    format?: 'plain-text' | 'markdown';
+    length?: 'short' | 'medium' | 'long';
+  }): Promise<AISummarizer>;
+}
+
+interface AIWriter {
+  write(input: string, options?: { context?: string }): Promise<string>;
+  writeStreaming?(input: string, options?: { context?: string }): ReadableStream;
+  destroy?(): void;
+}
+
+interface AIWriterFactory {
+  capabilities(): Promise<{
+    available: 'readily' | 'after-download' | 'no';
+  }>;
+  create(options?: {
+    tone?: 'formal' | 'neutral' | 'casual';
+    format?: 'plain-text' | 'markdown';
+    length?: 'short' | 'medium' | 'long';
+  }): Promise<AIWriter>;
+}
+
+interface AITranslator {
+  translate(input: string): Promise<string>;
+  destroy?(): void;
+}
+
+interface AITranslatorFactory {
+  capabilities(config: {
+    sourceLanguage: string;
+    targetLanguage: string;
+  }): Promise<{
+    available: 'readily' | 'after-download' | 'no';
+  }>;
+  create(config: {
+    sourceLanguage: string;
+    targetLanguage: string;
+  }): Promise<AITranslator>;
+}
+
 interface ChromeAI {
-  summarizer?: {
-    create(): Promise<{
-      run(input: { text: string }): Promise<{ result: string }>;
-    }>;
-  };
-  rewriter?: {
-    create(): Promise<{
-      run(input: { text: string; context?: string }): Promise<{ result: string }>;
-    }>;
-  };
-  prompt?: {
-    create(): Promise<{
-      run(input: { prompt: string }): Promise<{ result: string }>;
-    }>;
-  };
-  translator?: {
-    create(): Promise<{
-      run(input: { text: string; targetLanguage: string }): Promise<{ result: string }>;
-    }>;
-  };
+  languageModel?: AILanguageModelFactory;
+  summarizer?: AISummarizerFactory;
+  writer?: AIWriterFactory;
+  translator?: AITranslatorFactory;
 }
 
 declare global {
   interface Window {
     ai?: ChromeAI;
   }
+  
+  // The new API is available as global 'ai' or 'self.ai'
+  const ai: ChromeAI | undefined;
 }
 
 /**
@@ -37,19 +94,21 @@ declare global {
  * @returns {boolean} true if at least one Chrome AI API is available
  */
 export function checkChromeAI(): boolean {
-  // Check if window.ai exists
-  if (!window.ai) {
+  // Check if the global 'ai' or 'self.ai' exists
+  const chromeAI = (typeof ai !== 'undefined' ? ai : (self as Window & typeof globalThis).ai) as ChromeAI | undefined;
+  
+  if (!chromeAI) {
     showAIWarning();
     return false;
   }
 
   // Check if at least one API is available
-  const hasSummarizer = !!window.ai.summarizer;
-  const hasRewriter = !!window.ai.rewriter;
-  const hasPrompt = !!window.ai.prompt;
-  const hasTranslator = !!window.ai.translator;
+  const hasSummarizer = !!chromeAI.summarizer;
+  const hasWriter = !!chromeAI.writer;
+  const hasLanguageModel = !!chromeAI.languageModel;
+  const hasTranslator = !!chromeAI.translator;
 
-  const hasAnyAPI = hasSummarizer || hasRewriter || hasPrompt || hasTranslator;
+  const hasAnyAPI = hasSummarizer || hasWriter || hasLanguageModel || hasTranslator;
 
   if (!hasAnyAPI) {
     showAIWarning();
@@ -162,19 +221,20 @@ To use AI features:
 export function getChromeAIStatus(): {
   available: boolean;
   summarizer: boolean;
-  rewriter: boolean;
-  prompt: boolean;
+  writer: boolean;
+  languageModel: boolean;
   translator: boolean;
   browser: string;
 } {
   const isChrome = navigator.userAgent.includes('Chrome') && !navigator.userAgent.includes('Edg');
+  const chromeAI = (typeof ai !== 'undefined' ? ai : (self as Window & typeof globalThis).ai) as ChromeAI | undefined;
   
   return {
     available: checkChromeAI(),
-    summarizer: !!(window.ai?.summarizer),
-    rewriter: !!(window.ai?.rewriter),
-    prompt: !!(window.ai?.prompt),
-    translator: !!(window.ai?.translator),
+    summarizer: !!(chromeAI?.summarizer),
+    writer: !!(chromeAI?.writer),
+    languageModel: !!(chromeAI?.languageModel),
+    translator: !!(chromeAI?.translator),
     browser: isChrome ? 'Chrome' : navigator.userAgent.includes('Firefox') ? 'Firefox' : 
              navigator.userAgent.includes('Safari') ? 'Safari' :
              navigator.userAgent.includes('Edg') ? 'Edge' : 'Unknown'
@@ -202,6 +262,8 @@ export async function safeChromeAICall<T>(
     return 'Chrome AI operation failed. Please try again.';
   }
 }
+
+
 
 
 

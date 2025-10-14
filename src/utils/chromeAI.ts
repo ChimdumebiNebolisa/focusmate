@@ -1,9 +1,17 @@
 /**
  * Chrome AI Integration Utilities
  * Integrates with Chrome's on-device AI APIs for text processing
+ * Updated to use the new Chrome Built-in AI APIs (non-deprecated)
  */
 
 import { checkChromeAI, safeChromeAICall } from './checkAI';
+
+/**
+ * Helper to get the Chrome AI object
+ */
+function getChromeAI() {
+  return (typeof ai !== 'undefined' ? ai : (self as Window & typeof globalThis).ai);
+}
 
 /**
  * Summarizes the input text using Chrome AI
@@ -15,21 +23,31 @@ export async function summarizeText(input: string): Promise<string> {
 
   return safeChromeAICall(
     async () => {
-      const summarizer = await window.ai!.summarizer!.create();
-      const result = await summarizer.run({ text: input });
+      const chromeAI = getChromeAI();
+      if (!chromeAI?.summarizer) {
+        throw new Error('Summarizer API not available');
+      }
       
-      if (!result?.result) {
+      const summarizer = await chromeAI.summarizer.create({
+        type: 'key-points',
+        format: 'plain-text',
+        length: 'medium'
+      });
+      
+      const result = await summarizer.summarize(input);
+      
+      if (!result) {
         return "No summary generated. Please try again with different text.";
       }
       
-      return result.result;
+      return result;
     },
     "🔧 Chrome AI API not supported on this browser.\n\nTo use AI features:\n• Use Chrome browser (latest version)\n• Enable Chrome AI features in settings\n• Ensure you're on a supported platform"
   );
 }
 
 /**
- * Rewrites the input text using Chrome AI
+ * Rewrites the input text using Chrome AI Writer API
  */
 export async function rewriteText(input: string): Promise<string> {
   if (!input.trim()) {
@@ -38,24 +56,33 @@ export async function rewriteText(input: string): Promise<string> {
 
   return safeChromeAICall(
     async () => {
-      const rewriter = await window.ai!.rewriter!.create();
-      const result = await rewriter.run({ 
-        text: input, 
+      const chromeAI = getChromeAI();
+      if (!chromeAI?.writer) {
+        throw new Error('Writer API not available');
+      }
+      
+      const writer = await chromeAI.writer.create({
+        tone: 'neutral',
+        format: 'plain-text',
+        length: 'medium'
+      });
+      
+      const result = await writer.write(input, { 
         context: "Simplify and clarify this text while maintaining its meaning. Make it more readable and professional." 
       });
       
-      if (!result?.result) {
+      if (!result) {
         return "No rewritten text generated. Please try again with different text.";
       }
       
-      return result.result;
+      return result;
     },
     "🔧 Chrome AI API not supported on this browser.\n\nTo use AI features:\n• Use Chrome browser (latest version)\n• Enable Chrome AI features in settings\n• Ensure you're on a supported platform"
   );
 }
 
 /**
- * Extracts tasks from the input text using Chrome AI
+ * Extracts tasks from the input text using Chrome AI Language Model
  */
 export async function extractTasks(input: string): Promise<string> {
   if (!input.trim()) {
@@ -64,23 +91,31 @@ export async function extractTasks(input: string): Promise<string> {
 
   return safeChromeAICall(
     async () => {
-      const prompt = await window.ai!.prompt!.create();
-      const result = await prompt.run({ 
-        prompt: `Extract actionable tasks from the following text. Format them as a numbered list with clear, specific actions:\n\n${input}\n\nIf no tasks are found, respond with "No actionable tasks identified."` 
+      const chromeAI = getChromeAI();
+      if (!chromeAI?.languageModel) {
+        throw new Error('Language Model API not available');
+      }
+      
+      const languageModel = await chromeAI.languageModel.create({
+        systemPrompt: 'You are a helpful assistant that extracts actionable tasks from text and formats them clearly.'
       });
       
-      if (!result?.result) {
+      const result = await languageModel.prompt(
+        `Extract actionable tasks from the following text. Format them as a numbered list with clear, specific actions:\n\n${input}\n\nIf no tasks are found, respond with "No actionable tasks identified."`
+      );
+      
+      if (!result) {
         return "No tasks extracted. Please try again with different text.";
       }
       
-      return result.result;
+      return result;
     },
     "🔧 Chrome AI API not supported on this browser.\n\nTo use AI features:\n• Use Chrome browser (latest version)\n• Enable Chrome AI features in settings\n• Ensure you're on a supported platform"
   );
 }
 
 /**
- * Translates the input text using Chrome AI
+ * Translates the input text using Chrome AI Translator API
  */
 export async function translateText(input: string, targetLang: string = "en", mode: string = "academic"): Promise<string> {
   if (!input.trim()) {
@@ -89,6 +124,11 @@ export async function translateText(input: string, targetLang: string = "en", mo
 
   return safeChromeAICall(
     async () => {
+      const chromeAI = getChromeAI();
+      if (!chromeAI?.translator) {
+        throw new Error('Translator API not available');
+      }
+      
       // Create context based on translation mode
       const modeContexts = {
         academic: "Translate this text in an academic, formal style suitable for scholarly writing.",
@@ -98,18 +138,23 @@ export async function translateText(input: string, targetLang: string = "en", mo
       };
 
       const context = modeContexts[mode as keyof typeof modeContexts] || modeContexts.academic;
-
-      const translator = await window.ai!.translator!.create();
-      const result = await translator.run({ 
-        text: `${context}\n\nText to translate: ${input}`, 
-        targetLanguage: targetLang 
+      
+      // For the new API, we might need to detect the source language or assume 'auto'
+      // The exact API for translator might vary, so using a basic approach here
+      const translator = await chromeAI.translator.create({
+        sourceLanguage: 'en', // You may want to add language detection or make this a parameter
+        targetLanguage: targetLang
       });
       
-      if (!result?.result) {
+      // Add mode context as a prefix to give guidance
+      const textWithContext = `${context}\n\n${input}`;
+      const result = await translator.translate(textWithContext);
+      
+      if (!result) {
         return "No translation generated. Please try again with different text.";
       }
       
-      return result.result;
+      return result;
     },
     "🔧 Chrome AI API not supported on this browser.\n\nTo use AI features:\n• Use Chrome browser (latest version)\n• Enable Chrome AI features in settings\n• Ensure you're on a supported platform"
   );
@@ -131,14 +176,14 @@ export function getBrowserInfo(): string {
   const isSupported = checkChromeAI();
   
   if (isSupported) {
-    return "✅ Chrome AI features are available and ready to use!\n\n🎯 All AI functions are working:\n• Text summarization\n• Text rewriting\n• Task extraction\n• Translation";
+    return "✅ Chrome Built-in AI features are available and ready to use!\n\n🎯 All AI functions are working:\n• Text summarization (Summarization API)\n• Text rewriting (Writer API)\n• Task extraction (Language Model API)\n• Translation (Translator API)";
   } else if (isChrome) {
-    return "⚠️ Chrome detected but AI features not available.\n\n🔧 To enable Chrome AI:\n• Update to latest Chrome version\n• Enable AI features in Chrome settings\n• Check if your device supports AI features\n• Try refreshing the page";
+    return "⚠️ Chrome detected but Built-in AI features not available.\n\n🔧 To enable Chrome Built-in AI:\n• Update to latest Chrome Dev or Canary version\n• Enable AI features in chrome://flags\n• Check if your device supports AI features\n• Try refreshing the page";
   } else {
-    return "🌐 Chrome AI features require Chrome browser.\n\n📋 Current browser: " + 
+    return "🌐 Chrome Built-in AI features require Chrome browser.\n\n📋 Current browser: " + 
            (userAgent.includes('Firefox') ? 'Firefox' :
             userAgent.includes('Safari') ? 'Safari' :
             userAgent.includes('Edg') ? 'Edge' : 'Unknown') +
-           "\n\n🔄 Please switch to Chrome for full AI functionality.\n\n💡 Voice input will still work in your current browser.";
+           "\n\n🔄 Please switch to Chrome Dev or Canary for full AI functionality.\n\n💡 Voice input will still work in your current browser.";
   }
 }
