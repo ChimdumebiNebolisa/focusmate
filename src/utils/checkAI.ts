@@ -81,11 +81,8 @@ interface ChromeAI {
 }
 
 declare global {
-  interface Window {
-    ai?: ChromeAI;
-  }
-  
-  // The new API is available as global 'ai' or 'self.ai'
+  // The Chrome Built-in AI APIs are available as global 'ai' or 'self.ai'
+  // NOT as window.ai (that is deprecated)
   const ai: ChromeAI | undefined;
 }
 
@@ -94,14 +91,15 @@ declare global {
  * @returns {boolean} true if at least one Chrome AI API is available
  */
 export function checkChromeAI(): boolean {
-  // Check if the global 'ai' exists on window or self
-  // Try window.ai first, then self.ai
-  const chromeAI = (window.ai || (self as Window & typeof globalThis).ai) as ChromeAI | undefined;
+  // Check if the global 'ai' exists (NOT window.ai - that's deprecated)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const chromeAI = (typeof ai !== 'undefined' ? ai : (self as any).ai) as ChromeAI | undefined;
   
   // Debug logging
   console.log('Chrome AI Detection:', {
-    windowAI: !!window.ai,
-    selfAI: !!(self as Window & typeof globalThis).ai,
+    globalAI: typeof ai !== 'undefined',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    selfAI: typeof (self as any).ai !== 'undefined',
     hasAPI: !!chromeAI,
     apis: chromeAI ? {
       summarizer: !!chromeAI.summarizer,
@@ -249,7 +247,8 @@ export function getChromeAIStatus(): {
   browser: string;
 } {
   const isChrome = navigator.userAgent.includes('Chrome') && !navigator.userAgent.includes('Edg');
-  const chromeAI = (window.ai || (self as Window & typeof globalThis).ai) as ChromeAI | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const chromeAI = (typeof ai !== 'undefined' ? ai : (self as any).ai) as ChromeAI | undefined;
   
   return {
     available: checkChromeAI(),

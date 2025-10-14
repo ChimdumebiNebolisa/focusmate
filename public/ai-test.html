@@ -158,21 +158,24 @@
             const statusDiv = document.getElementById('apiStatus');
             statusDiv.innerHTML = '<p>Checking APIs...</p>';
 
+            // Access the global 'ai' object (NOT window.ai - that's deprecated)
+            const globalAI = (typeof ai !== 'undefined' ? ai : self.ai);
+            
             const results = {
-                windowAI: !!window.ai,
+                globalAI: !!globalAI,
                 apis: {}
             };
 
-            if (window.ai) {
-                results.apis.languageModel = !!window.ai.languageModel;
-                results.apis.summarizer = !!window.ai.summarizer;
-                results.apis.writer = !!window.ai.writer;
-                results.apis.translator = !!window.ai.translator;
+            if (globalAI) {
+                results.apis.languageModel = !!globalAI.languageModel;
+                results.apis.summarizer = !!globalAI.summarizer;
+                results.apis.writer = !!globalAI.writer;
+                results.apis.translator = !!globalAI.translator;
 
                 // Check capabilities
-                if (window.ai.languageModel) {
+                if (globalAI.languageModel) {
                     try {
-                        const caps = await window.ai.languageModel.capabilities();
+                        const caps = await globalAI.languageModel.capabilities();
                         results.languageModelCapabilities = caps;
                     } catch (e) {
                         results.languageModelError = e.message;
@@ -183,8 +186,8 @@
             // Display results
             let html = '';
             
-            if (results.windowAI) {
-                html += '<div class="status success">✅ window.ai is available!</div><br>';
+            if (results.globalAI) {
+                html += '<div class="status success">✅ Chrome Built-in AI is available!</div><br>';
                 Object.entries(results.apis).forEach(([api, available]) => {
                     html += `<div class="status ${available ? 'success' : 'error'}">${available ? '✅' : '❌'} ${api}</div>`;
                 });
@@ -196,7 +199,7 @@
 
                 document.getElementById('testCard').classList.remove('hidden');
             } else {
-                html += '<div class="status error">❌ window.ai is NOT available</div><br>';
+                html += '<div class="status error">❌ Chrome Built-in AI is NOT available</div><br>';
                 html += '<p>⚠️ The Chrome Built-in AI APIs are not detected. Please follow the setup instructions below.</p>';
                 document.getElementById('testCard').classList.add('hidden');
             }
@@ -212,7 +215,8 @@
             resultsDiv.innerHTML = '<p>⏳ Testing Language Model API...</p>';
 
             try {
-                const model = await window.ai.languageModel.create({
+                const globalAI = (typeof ai !== 'undefined' ? ai : self.ai);
+                const model = await globalAI.languageModel.create({
                     systemPrompt: 'You are a helpful assistant.'
                 });
                 const result = await model.prompt(`Analyze this text: ${input}`);
@@ -228,7 +232,8 @@
             resultsDiv.innerHTML = '<p>⏳ Testing Summarizer API...</p>';
 
             try {
-                const summarizer = await window.ai.summarizer.create({
+                const globalAI = (typeof ai !== 'undefined' ? ai : self.ai);
+                const summarizer = await globalAI.summarizer.create({
                     type: 'key-points',
                     format: 'plain-text',
                     length: 'medium'
@@ -246,7 +251,8 @@
             resultsDiv.innerHTML = '<p>⏳ Testing Writer API...</p>';
 
             try {
-                const writer = await window.ai.writer.create({
+                const globalAI = (typeof ai !== 'undefined' ? ai : self.ai);
+                const writer = await globalAI.writer.create({
                     tone: 'neutral',
                     format: 'plain-text'
                 });
@@ -265,7 +271,8 @@
             resultsDiv.innerHTML = '<p>⏳ Testing Translator API...</p>';
 
             try {
-                const translator = await window.ai.translator.create({
+                const globalAI = (typeof ai !== 'undefined' ? ai : self.ai);
+                const translator = await globalAI.translator.create({
                     sourceLanguage: 'en',
                     targetLanguage: 'es'
                 });

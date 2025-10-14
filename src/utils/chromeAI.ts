@@ -8,9 +8,11 @@ import { checkChromeAI, safeChromeAICall } from './checkAI';
 
 /**
  * Helper to get the Chrome AI object
+ * Accesses the global 'ai' object (NOT window.ai - that's deprecated)
  */
 function getChromeAI() {
-  return window.ai || (self as Window & typeof globalThis).ai;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (typeof ai !== 'undefined' ? ai : (self as any).ai);
 }
 
 /**
