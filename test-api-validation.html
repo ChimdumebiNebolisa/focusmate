@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusMate API & Origin Token Validation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .status {
+            font-size: 14px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: inline-block;
+            margin: 5px 5px 5px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        button {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px 5px 5px 0;
+        }
+        button:hover {
+            background: #1557b0;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+        .token-info {
+            background: #e8f4fd;
+            border: 1px solid #bee5eb;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+        .test-section {
+            border-left: 4px solid #1a73e8;
+            padding-left: 16px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔍 FocusMate API & Origin Token Validation</h1>
+        <p>This page validates that all APIs and origin tokens are working correctly for your FocusMate application.</p>
+    </div>
+
+    <div class="card">
+        <h2>📋 Origin Token Analysis</h2>
+        <div id="originTokenStatus"></div>
+        <button onclick="validateOriginTokens()">🔍 Validate Origin Tokens</button>
+    </div>
+
+    <div class="card">
+        <h2>🤖 Chrome AI API Status</h2>
+        <div id="chromeAIStatus"></div>
+        <button onclick="testChromeAI()">🧪 Test Chrome AI APIs</button>
+    </div>
+
+    <div class="card">
+        <h2>🌐 Browser & Environment</h2>
+        <div id="browserInfo"></div>
+    </div>
+
+    <div class="card">
+        <h2>🔒 Security Validation</h2>
+        <div id="securityStatus"></div>
+        <button onclick="runSecurityChecks()">🔐 Run Security Checks</button>
+    </div>
+
+    <div class="card">
+        <h2>📊 Test Results</h2>
+        <div id="testResults"></div>
+    </div>
+
+    <script>
+        // Origin Token Validation
+        function validateOriginTokens() {
+            const statusDiv = document.getElementById('originTokenStatus');
+            statusDiv.innerHTML = '<p>Validating origin tokens...</p>';
+
+            const originTrials = document.querySelectorAll('meta[http-equiv="origin-trial"]');
+            const results = [];
+
+            originTrials.forEach((meta, index) => {
+                const token = meta.getAttribute('content');
+                if (token) {
+                    try {
+                        // Decode base64 token to get JSON
+                        const decodedToken = atob(token);
+                        const tokenData = JSON.parse(decodedToken);
+                        
+                        results.push({
+                            index: index + 1,
+                            valid: true,
+                            data: tokenData,
+                            token: token.substring(0, 50) + '...'
+                        });
+                    } catch (error) {
+                        results.push({
+                            index: index + 1,
+                            valid: false,
+                            error: error.message,
+                            token: token.substring(0, 50) + '...'
+                        });
+                    }
+                }
+            });
+
+            let html = '';
+            results.forEach(result => {
+                if (result.valid) {
+                    html += `<div class="status success">✅ Token ${result.index} Valid</div>`;
+                    html += `<div class="token-info">
+                        <strong>Feature:</strong> ${result.data.feature}<br>
+                        <strong>Origin:</strong> ${result.data.origin}<br>
+                        <strong>Expires:</strong> ${new Date(result.data.expiry * 1000).toLocaleDateString()}<br>
+                        <strong>Subdomain:</strong> ${result.data.isSubdomain ? 'Yes' : 'No'}
+                    </div>`;
+                } else {
+                    html += `<div class="status error">❌ Token ${result.index} Invalid</div>`;
+                    html += `<div class="token-info">
+                        <strong>Error:</strong> ${result.error}
+                    </div>`;
+                }
+            });
+
+            statusDiv.innerHTML = html;
+            return results;
+        }
+
+        // Chrome AI API Testing
+        function testChromeAI() {
+            const statusDiv = document.getElementById('chromeAIStatus');
+            statusDiv.innerHTML = '<p>Testing Chrome AI APIs...</p>';
+
+            const results = {
+                globalAI: false,
+                apis: {},
+                capabilities: {},
+                errors: []
+            };
+
+            try {
+                // Check if self.ai exists
+                const globalAI = ('ai' in self ? self.ai : undefined);
+                results.globalAI = !!globalAI;
+
+                if (globalAI) {
+                    // Test each API
+                    results.apis.summarizer = !!globalAI.summarizer;
+                    results.apis.translator = !!globalAI.translator;
+                    results.apis.writer = !!globalAI.writer;
+                    results.apis.languageModel = !!globalAI.languageModel;
+
+                    // Test capabilities for available APIs
+                    if (globalAI.summarizer) {
+                        try {
+                            globalAI.summarizer.capabilities().then(caps => {
+                                results.capabilities.summarizer = caps;
+                                updateChromeAIStatus(results);
+                            }).catch(err => {
+                                results.errors.push(`Summarizer capabilities: ${err.message}`);
+                                updateChromeAIStatus(results);
+                            });
+                        } catch (err) {
+                            results.errors.push(`Summarizer capabilities: ${err.message}`);
+                        }
+                    }
+
+                    if (globalAI.translator) {
+                        try {
+                            globalAI.translator.capabilities({ sourceLanguage: 'en', targetLanguage: 'es' }).then(caps => {
+                                results.capabilities.translator = caps;
+                                updateChromeAIStatus(results);
+                            }).catch(err => {
+                                results.errors.push(`Translator capabilities: ${err.message}`);
+                                updateChromeAIStatus(results);
+                            });
+                        } catch (err) {
+                            results.errors.push(`Translator capabilities: ${err.message}`);
+                        }
+                    }
+                }
+
+                updateChromeAIStatus(results);
+            } catch (error) {
+                results.errors.push(`Global error: ${error.message}`);
+                updateChromeAIStatus(results);
+            }
+        }
+
+        function updateChromeAIStatus(results) {
+            const statusDiv = document.getElementById('chromeAIStatus');
+            let html = '';
+
+            if (results.globalAI) {
+                html += '<div class="status success">✅ Chrome Built-in AI Available</div><br>';
+                
+                Object.entries(results.apis).forEach(([api, available]) => {
+                    html += `<div class="status ${available ? 'success' : 'error'}">${available ? '✅' : '❌'} ${api}</div>`;
+                });
+
+                if (Object.keys(results.capabilities).length > 0) {
+                    html += '<br><strong>API Capabilities:</strong><pre>' + JSON.stringify(results.capabilities, null, 2) + '</pre>';
+                }
+
+                if (results.errors.length > 0) {
+                    html += '<br><strong>Errors:</strong><ul>';
+                    results.errors.forEach(error => {
+                        html += `<li class="status warning">⚠️ ${error}</li>`;
+                    });
+                    html += '</ul>';
+                }
+            } else {
+                html += '<div class="status error">❌ Chrome Built-in AI Not Available</div><br>';
+                html += '<div class="status info">💡 Make sure you\'re using Chrome 138+ with AI features enabled</div>';
+            }
+
+            statusDiv.innerHTML = html;
+        }
+
+        // Browser Information
+        function displayBrowserInfo() {
+            const info = {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                isChrome: /Chrome/.test(navigator.userAgent) && !/Edg/.test(navigator.userAgent),
+                chromeVersion: (() => {
+                    const match = navigator.userAgent.match(/Chrome\/(\d+)/);
+                    return match ? match[1] : 'Unknown';
+                })(),
+                isSecure: location.protocol === 'https:',
+                origin: location.origin
+            };
+            
+            const browserInfoDiv = document.getElementById('browserInfo');
+            browserInfoDiv.innerHTML = `
+                <div class="status ${info.isChrome ? 'success' : 'warning'}">
+                    ${info.isChrome ? '✅' : '⚠️'} Browser: ${info.isChrome ? 'Chrome' : 'Other'}
+                </div>
+                <div class="status ${info.isSecure ? 'success' : 'error'}">
+                    ${info.isSecure ? '✅' : '❌'} HTTPS: ${info.isSecure ? 'Enabled' : 'Disabled'}
+                </div>
+                <div class="status info">🌐 Origin: ${info.origin}</div>
+                <pre>${JSON.stringify(info, null, 2)}</pre>
+            `;
+        }
+
+        // Security Checks
+        function runSecurityChecks() {
+            const securityDiv = document.getElementById('securityStatus');
+            securityDiv.innerHTML = '<p>Running security checks...</p>';
+
+            const checks = [
+                {
+                    name: 'HTTPS Required',
+                    status: location.protocol === 'https:',
+                    message: location.protocol === 'https:' ? 'Secure connection detected' : 'HTTPS required for AI APIs'
+                },
+                {
+                    name: 'Origin Token Present',
+                    status: document.querySelectorAll('meta[http-equiv="origin-trial"]').length > 0,
+                    message: document.querySelectorAll('meta[http-equiv="origin-trial"]').length > 0 ? 'Origin tokens configured' : 'No origin tokens found'
+                },
+                {
+                    name: 'CSP Headers',
+                    status: document.querySelector('meta[http-equiv="Content-Security-Policy"]') !== null,
+                    message: document.querySelector('meta[http-equiv="Content-Security-Policy"]') !== null ? 'CSP configured' : 'No CSP headers detected'
+                },
+                {
+                    name: 'API Key Exposure',
+                    status: !document.documentElement.innerHTML.includes('AI_API_KEY') && !document.documentElement.innerHTML.includes('OPENAI_API_KEY'),
+                    message: 'No hardcoded API keys detected in HTML'
+                }
+            ];
+
+            let html = '';
+            checks.forEach(check => {
+                html += `<div class="status ${check.status ? 'success' : 'error'}">
+                    ${check.status ? '✅' : '❌'} ${check.name}: ${check.message}
+                </div>`;
+            });
+
+            securityDiv.innerHTML = html;
+        }
+
+        // Comprehensive Test
+        function runComprehensiveTest() {
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = '<p>Running comprehensive tests...</p>';
+
+            const tests = [];
+
+            // Test 1: Origin Tokens
+            const originResults = validateOriginTokens();
+            tests.push({
+                name: 'Origin Token Validation',
+                status: originResults.every(r => r.valid),
+                details: originResults
+            });
+
+            // Test 2: Chrome AI Availability
+            const aiAvailable = checkChromeAI();
+            tests.push({
+                name: 'Chrome AI Availability',
+                status: aiAvailable,
+                details: getChromeAIStatus()
+            });
+
+            // Test 3: API Functionality (if available)
+            if (aiAvailable) {
+                testSummarizerAPI().then(result => {
+                    tests.push({
+                        name: 'Summarizer API Test',
+                        status: result.success,
+                        details: result
+                    });
+                    updateTestResults(tests);
+                });
+            }
+
+            updateTestResults(tests);
+        }
+
+        function updateTestResults(tests) {
+            const resultsDiv = document.getElementById('testResults');
+            let html = '';
+
+            tests.forEach(test => {
+                html += `<div class="test-section">
+                    <div class="status ${test.status ? 'success' : 'error'}">
+                        ${test.status ? '✅' : '❌'} ${test.name}
+                    </div>
+                    <pre>${JSON.stringify(test.details, null, 2)}</pre>
+                </div>`;
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // Test Summarizer API
+        async function testSummarizerAPI() {
+            try {
+                const globalAI = ('ai' in self ? self.ai : undefined);
+                if (!globalAI?.summarizer) {
+                    return { success: false, error: 'Summarizer API not available' };
+                }
+
+                const summarizer = await globalAI.summarizer.create({
+                    type: 'key-points',
+                    format: 'plain-text',
+                    length: 'medium'
+                });
+
+                const testText = "This is a test text to validate that the Chrome AI Summarizer API is working correctly in your FocusMate application.";
+                const result = await summarizer.summarize(testText);
+
+                return {
+                    success: true,
+                    input: testText,
+                    output: result,
+                    timestamp: new Date().toISOString()
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    error: error.message,
+                    timestamp: new Date().toISOString()
+                };
+            }
+        }
+
+        // Helper functions from checkAI.ts
+        function checkChromeAI() {
+            const chromeAI = ('ai' in self ? self.ai : undefined);
+            return !!(chromeAI && (chromeAI.summarizer || chromeAI.translator));
+        }
+
+        function getChromeAIStatus() {
+            const isChrome = navigator.userAgent.includes('Chrome') && !navigator.userAgent.includes('Edg');
+            const chromeAI = ('ai' in self ? self.ai : undefined);
+            const chromeVersionMatch = navigator.userAgent.match(/Chrome\/(\d+)/);
+            const chromeVersion = chromeVersionMatch ? chromeVersionMatch[1] : 'Unknown';
+            
+            return {
+                available: checkChromeAI(),
+                summarizer: !!(chromeAI?.summarizer),
+                translator: !!(chromeAI?.translator),
+                writer: !!(chromeAI?.writer),
+                languageModel: !!(chromeAI?.languageModel),
+                browser: isChrome ? 'Chrome' : 'Other',
+                chromeVersion
+            };
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            displayBrowserInfo();
+            runComprehensiveTest();
+        });
+    </script>
+</body>
+</html>
