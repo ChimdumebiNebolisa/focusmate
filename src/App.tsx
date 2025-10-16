@@ -7,6 +7,7 @@ import {
 } from './utils/chromeAI';
 import { saveSession, loadSession, clearSession, type SessionData } from './utils/localStorage';
 import { readFileAsText, triggerFileUpload } from './utils/fileUpload';
+import { aiStatusMonitor } from './utils/aiStatusMonitor';
 import { Mic, Brain, Sun, Moon, Upload, Copy, Download, Trash2 } from 'lucide-react';
 
 type ActionType = 'summarize';
@@ -31,6 +32,7 @@ const App: React.FC = () => {
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [processingMode, setProcessingMode] = useState('academic');
+  const [aiStatus, setAiStatus] = useState(aiStatusMonitor.getStatus());
 
   const {
     transcript,
@@ -43,7 +45,7 @@ const App: React.FC = () => {
     confidence
   } = useSpeechRecognition();
 
-  // Load saved session on mount
+  // Load saved session on mount and initialize AI status monitoring
   useEffect(() => {
     const savedSession = loadSession();
     if (savedSession) {
@@ -51,6 +53,20 @@ const App: React.FC = () => {
       setOutputText(savedSession.outputText);
       setProcessingMode(savedSession.processingMode);
     }
+
+    // Initialize AI status monitoring
+    aiStatusMonitor.performHealthCheck().then(setAiStatus);
+    
+    // Subscribe to AI status changes
+    const unsubscribe = aiStatusMonitor.onStatusChange(setAiStatus);
+    
+    // Start periodic health checks
+    aiStatusMonitor.startHealthChecks(60000); // Check every minute
+    
+    return () => {
+      unsubscribe();
+      aiStatusMonitor.stopHealthChecks();
+    };
   }, []);
 
   // Auto-save session when input or output changes
@@ -134,15 +150,22 @@ const App: React.FC = () => {
       
       setOutputText(result);
 
-      // Show success message
-      if (result && !result.includes('Chrome AI API not supported')) {
+      // Show success message only for actual successful operations
+      if (result && !aiStatusMonitor.shouldShowFallbackError()) {
         setSuccessMessage(`${type.charAt(0).toUpperCase() + type.slice(1)} completed successfully!`);
         setShowSuccessToast(true);
         setTimeout(() => setShowSuccessToast(false), 3000);
       }
     } catch (error) {
       console.error('Action failed:', error);
-      setOutputText('Error: This feature requires Chrome AI capabilities. Please ensure you\'re using Chrome with AI features enabled.');
+      
+      // Only show fallback error if AI is genuinely not working
+      if (aiStatusMonitor.shouldShowFallbackError()) {
+        setOutputText(aiStatusMonitor.getUserFriendlyMessage());
+      } else {
+        // AI is working but this specific request failed
+        setOutputText('Sorry, I couldn\'t process that text. Please try again with different content.');
+      }
     } finally {
       setIsProcessing(false);
       setActiveAction(null);
@@ -288,6 +311,25 @@ const App: React.FC = () => {
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-10">
             Let FocusMate help you summarize your thoughts in different styles using Chrome's built-in AI.
           </p>
+          
+          {/* AI Status Indicator */}
+          <div className="flex justify-center mb-6">
+            <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
+              aiStatusMonitor.isReadyForUse() 
+                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+            }`}>
+              <div className={`w-2 h-2 rounded-full mr-2 ${
+                aiStatusMonitor.isReadyForUse() ? 'bg-green-500' : 'bg-yellow-500'
+              }`}></div>
+              {aiStatusMonitor.isReadyForUse() 
+                ? 'AI Ready' 
+                : aiStatus.isAvailable 
+                  ? 'AI Limited' 
+                  : 'AI Unavailable'
+              }
+            </div>
+          </div>
         </motion.div>
 
         {/* Two Column Layout */}

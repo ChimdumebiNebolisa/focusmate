@@ -7,7 +7,8 @@
  * The official replacement is LanguageModel, accessible via self.ai.languageModel.
  */
 
-import { checkChromeAI, safeChromeAICall } from './checkAI';
+import { checkChromeAI } from './checkAI';
+import { aiStatusMonitor } from './aiStatusMonitor';
 
 /**
  * Helper to get the Chrome AI object
@@ -29,48 +30,66 @@ function getChromeAI() {
 }
 
 /**
- * Summarizes the input text using Chrome AI
+ * Summarizes the input text using Chrome AI with intelligent error handling
  */
 export async function summarizeText(input: string, mode: string = 'academic'): Promise<string> {
   if (!input.trim()) {
     return "Please provide text to summarize.";
   }
 
-  return safeChromeAICall(
-    async () => {
-      const chromeAI = getChromeAI();
-      if (!chromeAI?.summarizer) {
-        throw new Error('Summarizer API not available');
-      }
-      
-      // Create context based on processing mode
-      const modeContexts = {
-        academic: "Summarize this text in an academic, formal style suitable for scholarly writing.",
-        concise: "Summarize this text in a concise, clear manner while preserving key information.",
-        creative: "Summarize this text with creative flair, maintaining the original's artistic expression.",
-        conversational: "Summarize this text in a natural, conversational tone as if speaking to a friend."
-      };
+  // Check AI status before attempting operation
+  await aiStatusMonitor.performHealthCheck();
+  
+  if (!aiStatusMonitor.isReadyForUse()) {
+    // Only show fallback error if AI is genuinely not working
+    return aiStatusMonitor.getUserFriendlyMessage();
+  }
 
-      const context = modeContexts[mode as keyof typeof modeContexts] || modeContexts.academic;
-      
-      const summarizer = await chromeAI.summarizer.create({
-        type: 'key-points',
-        format: 'plain-text',
-        length: 'medium'
-      });
-      
-      // Add mode context as a prefix to give guidance
-      const textWithContext = `${context}\n\n${input}`;
-      const result = await summarizer.summarize(textWithContext);
-      
-      if (!result) {
-        return "No summary generated. Please try again with different text.";
-      }
-      
-      return result;
-    },
-    "🔧 Chrome AI API not supported on this browser.\n\nTo use AI features:\n• Use Chrome browser (latest version)\n• Enable Chrome AI features in settings\n• Ensure you're on a supported platform"
-  );
+  try {
+    const chromeAI = getChromeAI();
+    if (!chromeAI?.summarizer) {
+      throw new Error('Summarizer API not available');
+    }
+    
+    // Create context based on processing mode
+    const modeContexts = {
+      academic: "Summarize this text in an academic, formal style suitable for scholarly writing.",
+      concise: "Summarize this text in a concise, clear manner while preserving key information.",
+      creative: "Summarize this text with creative flair, maintaining the original's artistic expression.",
+      conversational: "Summarize this text in a natural, conversational tone as if speaking to a friend."
+    };
+
+    const context = modeContexts[mode as keyof typeof modeContexts] || modeContexts.academic;
+    
+    const summarizer = await chromeAI.summarizer.create({
+      type: 'key-points',
+      format: 'plain-text',
+      length: 'medium'
+    });
+    
+    // Add mode context as a prefix to give guidance
+    const textWithContext = `${context}\n\n${input}`;
+    const result = await summarizer.summarize(textWithContext);
+    
+    if (!result) {
+      return "No summary generated. Please try again with different text.";
+    }
+    
+    return result;
+  } catch (error) {
+    console.error('Summarization error:', error);
+    
+    // Check if this is a genuine AI failure or just a temporary issue
+    const currentStatus = aiStatusMonitor.getStatus();
+    
+    if (currentStatus.isAvailable && currentStatus.isOperational) {
+      // AI is available but this specific request failed - don't show fallback
+      return "Sorry, I couldn't process that text. Please try again with different content.";
+    } else {
+      // AI is genuinely not working - show appropriate fallback message
+      return aiStatusMonitor.getUserFriendlyMessage();
+    }
+  }
 }
 
 
