@@ -2,7 +2,7 @@
 
 **Transform your thoughts into clear, actionable content with AI-powered tools**
 
-FocusMate is a modern web application that helps you organize, clean, and enhance your text using Chrome's on-device AI capabilities. Whether you're summarizing notes, cleaning up messy text, extracting tasks, or translating content, FocusMate makes your ideas instantly actionable.
+FocusMate is a modern single-page web application that helps you organize and enhance your text using Chrome's on-device AI capabilities. Whether you're summarizing notes or extracting tasks, FocusMate makes your ideas instantly actionable.
 
 ![FocusMate Hero](https://img.shields.io/badge/FocusMate-AI%20Powered-blue?style=for-the-badge&logo=chrome&logoColor=white)
 ![React](https://img.shields.io/badge/React-19+-61DAFB?style=for-the-badge&logo=react&logoColor=black)
@@ -15,7 +15,7 @@ FocusMate is a modern web application that helps you organize, clean, and enhanc
 ## 🧩 **Overview**
 
 FocusMate streamlines how you handle written content.  
-Whether it's an article, a report, or notes — FocusMate uses AI to help you **condense**, **refine**, and **organize** text into actionable insights without needing external APIs or servers.
+Whether it's an article, a report, or notes — FocusMate uses AI to help you **condense** and **organize** text into actionable insights without needing external APIs or servers.
 
 ---
 
@@ -24,9 +24,10 @@ Whether it's an article, a report, or notes — FocusMate uses AI to help you **
 | Feature | Description |
 |----------|--------------|
 | **Summarize** | Condense long text while preserving the key ideas and structure. |
-| **Clean** | Improve grammar, tone, and readability with one click. |
 | **Extract Tasks** | Identify action items, deadlines, and to-dos from raw text. |
-| **Translate** | Convert text between languages with style options (Academic, Concise, Creative, Conversational). |
+| **Voice Input** | Speak your thoughts and convert them to text instantly. |
+| **File Upload** | Upload .txt, .pdf, or .docx files for processing. |
+| **Multiple Styles** | Academic, Concise, Creative, and Conversational processing modes. |
 
 No timers. No distractions. Just pure, focused text enhancement.
 
@@ -34,11 +35,12 @@ No timers. No distractions. Just pure, focused text enhancement.
 
 ## 🧠 **How It Works**
 
-FocusMate leverages **Chrome's built-in AI capabilities** (Prompt, Summarization, and Editing APIs) to process text **locally in the browser**, ensuring privacy and instant performance.
+FocusMate leverages **Chrome's built-in AI capabilities** (Summarizer API) to process text **locally in the browser**, ensuring privacy and instant performance.
 
-1. Paste or type your text.  
-2. Choose an operation (Summarize, Clean, Extract Tasks, or Translate).  
-3. Instantly view AI-enhanced output — no backend or API keys required.
+1. Paste, type, speak, or upload your text.  
+2. Choose an operation (Summarize or Extract Tasks).  
+3. Select your preferred processing style.
+4. Instantly view AI-enhanced output — no backend or API keys required.
 
 ---
 
@@ -46,66 +48,37 @@ FocusMate leverages **Chrome's built-in AI capabilities** (Prompt, Summarization
 
 ### 🤖 AI-Powered Text Processing
 - **Summarize**: Condense text while keeping core meaning
-- **Clean**: Polish grammar, tone, and structure  
-- **Extract Tasks**: Identify key actions and to-dos
-- **Translate**: Convert text between languages with style options (Academic, Concise, Creative, Conversational)
+- **Extract Tasks**: Identify key actions and to-dos using pattern matching
+- **4 Processing Modes**: Academic, Concise, Creative, Conversational
 
 ### 🎤 Voice Input
-- Real-time speech recognition
-- Voice-to-text conversion
-- Confidence scoring
-- Multi-language support
+- **Speech-to-Text**: Convert voice to text using Web Speech API
+- **Real-time Transcription**: Live voice recognition with confidence scoring
+- **Error Handling**: Clear error messages for common issues
 
-### 🎨 Modern UI/UX
-- Responsive design for all devices
-- Dark/Light mode with smooth transitions
-- Animated gradients and micro-interactions
-- Professional tooltips and feedback
+### 📁 File Upload
+- **Multiple Formats**: Support for .txt, .pdf, and .docx files
+- **Size Limits**: Maximum 50KB file size for optimal performance
+- **Text Extraction**: Automatic text extraction from uploaded files
 
-### 🔐 User Management
-- Google OAuth authentication
-- Secure session management
-- History tracking and restoration
-- Cross-device synchronization
+### 💾 Data Persistence
+- **Auto-save**: Automatically saves your work to localStorage
+- **Session Recovery**: Restore your last session when you return
+- **No Backend**: All data stays on your device
 
-### 🛡️ Robust Error Handling
-- Chrome AI runtime checks
-- Graceful fallback systems
-- Browser compatibility validation
-- User-friendly error messages
+### 🎨 User Experience
+- **Dark/Light Mode**: Toggle between themes
+- **Responsive Design**: Works on desktop, tablet, and mobile
+- **Keyboard Shortcuts**: Power user features for efficiency
+- **Smooth Animations**: Framer Motion powered interactions
 
-## 🏗️ Tech Stack
+---
 
-### Frontend
-- **React 19** - Modern UI library with hooks and concurrent features
-- **TypeScript** - Type-safe development
-- **Vite** - Lightning-fast build tool and dev server
-- **Tailwind CSS** - Utility-first styling
-- **Framer Motion** - Smooth animations and transitions
-- **React Router** - Client-side routing
-
-### Authentication & Database
-- **Firebase Auth** - Google OAuth integration
-- **Firebase Firestore** - Real-time database
-- **Firebase Hosting** - Static site hosting
-
-### AI Integration
-- **Chrome AI APIs** - On-device AI processing
-- **Web Speech API** - Voice recognition
-- **Custom AI utilities** - Robust error handling
-
-### Development Tools
-- **ESLint** - Code linting and formatting
-- **PostCSS** - CSS processing
-- **Prettier** - Code formatting
-
-## 🚀 Quick Start
+## 🚀 **Quick Start**
 
 ### Prerequisites
-- Node.js 18+ 
-- npm or yarn
-- Chrome browser (latest version)
-- Chrome AI features enabled
+- **Chrome 138+** (for AI features)
+- **Node.js 18+** (for development)
 
 ### Installation
 
@@ -120,28 +93,14 @@ FocusMate leverages **Chrome's built-in AI capabilities** (Prompt, Summarization
    npm install
    ```
 
-3. **Set up environment variables**
-   ```bash
-   cp env.example .env.local
-   ```
-   
-   Add your Firebase configuration to `.env.local`:
-   ```env
-   VITE_FIREBASE_API_KEY=your_api_key
-   VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-   VITE_FIREBASE_PROJECT_ID=your_project_id
-   VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-   VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-   VITE_FIREBASE_APP_ID=your_app_id
-   ```
-
-4. **Start development server**
+3. **Start development server**
    ```bash
    npm run dev
    ```
 
-5. **Open your browser**
-   Navigate to `http://localhost:5173`
+4. **Open in Chrome**
+   - Navigate to `http://localhost:5173`
+   - Ensure you're using Chrome 138+ for AI features
 
 ### Building for Production
 
@@ -150,240 +109,81 @@ npm run build
 npm run preview
 ```
 
-## 🔧 Chrome AI Setup
+---
 
-FocusMate requires Chrome with AI features enabled for full functionality:
+## ⌨️ **Keyboard Shortcuts**
 
-### Enable Chrome AI Features
+| Shortcut | Action |
+|----------|--------|
+| `⌘1` | Summarize text |
+| `⌘3` | Extract tasks |
+| `⌘⏎` | Quick process (last used action) |
+| `⌘C` | Copy output |
+| `⌘D` | Download output |
+| `Esc` | Clear all |
 
-1. **Use Chrome Canary or Chrome Dev**
-   - Download from [Chrome Canary](https://www.google.com/chrome/canary/) or [Chrome Dev](https://www.google.com/chrome/dev/)
+---
 
-2. **Enable AI Flags**
-   Navigate to `chrome://flags` and enable:
-   - `#optimization-guide-on-device-model`
-   - `#prompt-api-for-gemini-nano`
-   - `#summarization-api-for-gemini-nano`
-   - `#writer-api-for-gemini-nano`
-   - `#translation-api`
+## 🛠️ **Tech Stack**
 
-3. **Restart Chrome**
-   - Close all Chrome windows
-   - Restart Chrome for flags to take effect
+- **Frontend**: React 19, TypeScript, Tailwind CSS
+- **Build Tool**: Vite
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+- **AI**: Chrome Built-in AI APIs
+- **Voice**: Web Speech API
+- **Storage**: localStorage
 
-4. **Verify Setup**
-   - Open Chrome DevTools
-   - Check if `ai.languageModel`, `ai.summarizer`, `ai.writer`, or `ai.translator` are available in the console
-   - Note: The old `window.ai` API is deprecated; use the new Chrome Built-in AI APIs
+---
 
-## 📱 Usage
+## 🔧 **Browser Compatibility**
 
-### Getting Started
+### Chrome AI Features (Chrome 138+)
+- ✅ Text Summarization
+- ⚠️ Task Extraction (pattern-based fallback)
 
-1. **Sign In**
-   - Click "Sign in with Google" on the landing page
-   - Grant necessary permissions
+### Universal Features
+- ✅ Voice Input (Web Speech API)
+- ✅ File Upload
+- ✅ Dark/Light Theme
+- ✅ Keyboard Shortcuts
+- ✅ Data Persistence
 
-2. **Input Text**
-   - Type directly in the input area
-   - Use voice input by clicking the microphone button
-   - Paste text from other sources
+---
 
-3. **Process Text**
-   - Click any action button: Summarize, Clean, Extract Tasks, or Translate
-   - Select translation mode if using the Translate feature
-   - View results in the output panel
+## 📱 **Usage**
 
-4. **Manage Sessions**
-   - Access history via the History button
-   - Restore previous sessions
-   - Clear cache when needed
+1. **Text Input**: Type directly, use voice input, or upload a file
+2. **Select Mode**: Choose Academic, Concise, Creative, or Conversational
+3. **Process**: Click Summarize or Extract Tasks
+4. **Export**: Copy to clipboard or download as .txt file
 
-### Features Guide
+---
 
-#### 📝 Summarize
-Condenses long text while preserving key information and meaning.
-
-#### ✨ Clean
-Improves grammar, tone, and readability while maintaining the original intent.
-
-#### ✅ Extract Tasks
-Identifies actionable items and organizes them into a clear task list.
-
-#### 🌍 Translate
-Converts text between languages with different style options:
-- **Academic**: Formal, scholarly tone
-- **Concise**: Clear and brief
-- **Creative**: Artistic and expressive
-- **Conversational**: Natural, friendly tone
-
-#### 🎤 Voice Input
-- Click the microphone to start recording
-- Speak clearly and at normal pace
-- Click again to stop recording
-- Text appears automatically in the input field
-
-## 🏗️ Project Structure
-
-```
-focusmate/
-├── src/
-│   ├── components/          # React components
-│   │   ├── AboutSection.tsx
-│   │   ├── DashboardLayout.tsx
-│   │   ├── Footer.tsx
-│   │   ├── GoogleButton.tsx
-│   │   ├── HistoryPanel.tsx
-│   │   ├── LandingHero.tsx
-│   │   ├── Navbar.tsx
-│   │   ├── ParticleBackground.tsx
-│   │   ├── SettingsPanel.tsx
-│   │   ├── VoiceMode.tsx
-│   │   └── Workspace.tsx
-│   ├── pages/              # Page components
-│   │   ├── Dashboard.tsx
-│   │   ├── Landing.tsx
-│   │   ├── LandingPage.tsx
-│   │   └── Settings.tsx
-│   ├── utils/              # Utility functions
-│   │   ├── checkAI.ts      # Chrome AI runtime checks
-│   │   ├── chromeAI.ts     # AI integration
-│   │   └── firebaseHelpers.ts
-│   ├── hooks/              # Custom React hooks
-│   │   ├── useAuth.ts
-│   │   └── useSpeechRecognition.ts
-│   ├── context/            # React context providers
-│   │   ├── AuthContext.tsx
-│   │   ├── AuthContextProvider.tsx
-│   │   └── ThemeContext.tsx
-│   ├── services/           # External service integrations
-│   │   └── historyService.ts
-│   ├── routes/             # Route components
-│   │   └── ProtectedRoute.tsx
-│   ├── App.tsx             # Main app component
-│   ├── main.tsx            # App entry point
-│   └── firebase.ts         # Firebase configuration
-├── public/                 # Static assets
-├── dist/                   # Build output
-├── vite.config.ts          # Vite configuration
-├── tailwind.config.js      # Tailwind configuration
-└── package.json           # Dependencies and scripts
-```
-
-## 🔧 Development
-
-### Available Scripts
-
-```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run preview      # Preview production build
-npm run lint         # Run ESLint
-```
-
-### Code Style
-
-- **TypeScript**: Strict mode enabled
-- **ESLint**: Airbnb configuration
-- **Prettier**: Code formatting
-- **Conventional Commits**: Commit message format
-
-### Contributing
+## 🤝 **Contributing**
 
 1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 🐛 Troubleshooting
+---
 
-### Common Issues
-
-#### Chrome AI Not Working
-- Ensure you're using Chrome Canary/Dev (version 127+)
-- Check that AI flags are enabled (see Chrome AI Setup section)
-- Verify `ai.languageModel`, `ai.summarizer`, `ai.writer`, or `ai.translator` exist in DevTools console
-- Note: `window.ai` is deprecated - the app now uses the new Chrome Built-in AI APIs
-- Try refreshing the page and clearing browser cache
-
-#### Voice Input Issues
-- Grant microphone permissions
-- Check browser compatibility
-- Ensure HTTPS connection (required for Web Speech API)
-
-#### Authentication Problems
-- Verify Firebase configuration
-- Check Google OAuth settings
-- Ensure domain is authorized
-
-#### Build Errors
-- Clear node_modules: `rm -rf node_modules && npm install`
-- Check Node.js version compatibility
-- Verify all environment variables are set
-
-### Browser Support
-
-| Browser | AI Features | Voice Input | Basic Features |
-|---------|-------------|-------------|----------------|
-| Chrome (Latest) | ✅ | ✅ | ✅ |
-| Chrome Canary | ✅ | ✅ | ✅ |
-| Chrome Dev | ✅ | ✅ | ✅ |
-| Firefox | ❌ | ✅ | ✅ |
-| Safari | ❌ | ✅ | ✅ |
-| Edge | ❌ | ✅ | ✅ |
-
-## 📄 License
+## 📄 **License**
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🤝 Contributing
+---
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+## 🙏 **Acknowledgments**
 
-### Development Setup
-
-1. Fork and clone the repository
-2. Install dependencies: `npm install`
-3. Set up environment variables
-4. Start development server: `npm run dev`
-5. Make your changes
-6. Run tests and linting: `npm run lint`
-7. Submit a pull request
-
-## 📞 Support
-
-- **Issues**: [GitHub Issues](https://github.com/ChimdumebiNebolisa/focusmate/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/ChimdumebiNebolisa/focusmate/discussions)
-- **Email**: [Contact Developer](mailto:your-email@example.com)
-
-## 🙏 Acknowledgments
-
-- Chrome AI team for the powerful on-device APIs
-- Firebase team for excellent developer tools
-- React and TypeScript communities
-- All contributors and users
-
-## 🪴 Roadmap
-
-- [x] Add keyboard shortcuts
-- [x] Add export options (copy, download as .txt)
-- [ ] Add history view for recent processed texts
-- [ ] Add "smart combine" mode for multi-step processing
-- [ ] Enhanced Chrome AI API integration as APIs mature
-- [ ] Plugin system for custom AI providers
-- [ ] Batch processing capabilities
-- [ ] Advanced text analytics
-
-## 📊 Project Status
-
-![GitHub last commit](https://img.shields.io/github/last-commit/ChimdumebiNebolisa/focusmate)
-![GitHub issues](https://img.shields.io/github/issues/ChimdumebiNebolisa/focusmate)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/ChimdumebiNebolisa/focusmate)
-![GitHub stars](https://img.shields.io/github/stars/ChimdumebiNebolisa/focusmate?style=social)
+- Chrome Built-in AI APIs for on-device processing
+- Web Speech API for voice input
+- React and Vite for the development experience
+- Tailwind CSS for styling
+- Framer Motion for animations
 
 ---
 
 **Made with ❤️ by [Chimdumebi Nebolisa](https://github.com/ChimdumebiNebolisa)**
-
-*Transform your thoughts into action with FocusMate*
