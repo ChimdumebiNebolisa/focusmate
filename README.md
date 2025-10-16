@@ -35,7 +35,7 @@ FocusMate pairs accountability, timers, and task tracking to help people maintai
 | Layer | Technologies |
 |---|---|
 | Frontend | React, TypeScript, Tailwind CSS |
-| Backend | Node.js/Express **or** Flask (choose one) |
+| Backend | Node.js/Express|
 | Database | PostgreSQL / Firebase |
 | Auth | JWT or OAuth |
 | Infra | Vercel / Render / Fly.io |
