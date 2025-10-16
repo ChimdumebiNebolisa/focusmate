@@ -126,8 +126,9 @@ export function checkChromeAI(): boolean {
     return false;
   }
 
-  // Only check APIs that actually work in web pages (Chrome 138+)
+  // Primary check: Summarizer API (works in web pages)
   const hasSummarizer = !!chromeAI.summarizer;
+  // Secondary check: Translator API (also works in web pages)
   const hasTranslator = !!chromeAI.translator;
 
   const hasAnyAPI = hasSummarizer || hasTranslator;
@@ -152,8 +153,12 @@ function showAIWarning(): void {
 
 To use AI features:
 • Update to Chrome 138+ (stable version)
-• Some APIs require chrome://flags enabled
-• Note: Only Summarizer & Translator work in web pages`;
+• Enable required flags in chrome://flags:
+  - #optimization-guide-on-device-model (set to "Enabled BypassPerfRequirement")
+  - #prompt-api-for-gemini-nano
+  - #summarization-api-for-gemini-nano
+• Download AI model in chrome://components (2GB, takes 5-30 minutes)
+• Note: Only Summarizer & Translator APIs work in web pages`;
 
   // Create a styled alert container
   const alertContainer = document.createElement('div');

@@ -63,14 +63,56 @@ class AIStatusMonitor {
     const version = chromeStatus.chromeVersion;
     
     if (!isChrome) {
-      return `Chrome AI features require Chrome browser. You're currently using ${chromeStatus.browser}.`;
+      return `Chrome AI features require Chrome browser. You're currently using ${chromeStatus.browser}.
+
+To use AI features:
+• Switch to Chrome 138+ (stable version)
+• Or integrate OpenAI/Claude API for universal browser support
+
+Voice input will still work in your current browser.`;
     }
     
     if (version !== 'Unknown' && parseInt(version) < 138) {
-      return `Chrome AI requires version 138+. You're running version ${version}. Please update Chrome.`;
+      return `Chrome AI requires version 138+. You're running version ${version}.
+
+Required steps:
+1. Update Chrome to version 138 or later
+   • Go to chrome://settings/help
+   • Click "Update Google Chrome" if available
+   • Or download from https://www.google.com/chrome/
+
+2. After updating, restart Chrome completely
+3. Refresh this page
+
+Expected download time: 5-30 minutes for 2GB AI model`;
     }
     
-    return 'Chrome AI features are not available. Please enable AI features in chrome://flags and restart Chrome.';
+    return `Chrome AI features are not available on this domain.
+
+Required steps:
+1. Enable Chrome AI flags:
+   • Go to chrome://flags
+   • Enable: #optimization-guide-on-device-model (set to "Enabled BypassPerfRequirement")
+   • Enable: #prompt-api-for-gemini-nano
+   • Enable: #summarization-api-for-gemini-nano
+   • Click "Relaunch" button
+
+2. Download AI model:
+   • Go to chrome://components
+   • Find "Optimization Guide On Device Model"
+   • Click "Check for update"
+   • Wait for 2GB download to complete
+
+3. Verify model status:
+   • Open chrome://on-device-internals
+   • Check "Model Status" tab shows "available"
+
+4. Test in DevTools:
+   • Open DevTools (F12)
+   • Run: await ai.summarizer.create()
+   • Should not throw error
+
+System requirements: 22GB free storage, GPU with 4GB+ VRAM`;
   }
 
   /**

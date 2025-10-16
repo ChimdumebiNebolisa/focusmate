@@ -21,8 +21,8 @@ function getChromeAI() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const chromeAI = (self as any).ai;
   
-  if (!chromeAI?.languageModel) {
-    console.warn("LanguageModel API not supported in this browser.");
+  if (!chromeAI?.summarizer) {
+    console.warn("Summarizer API not available. Requires Chrome 138+ with AI features enabled.");
     return undefined;
   }
   
@@ -123,12 +123,12 @@ export function getBrowserInfo(): string {
     if (chromeVersion < 138) {
       return "⚠️ Chrome version " + chromeVersion + " detected.\n\n🔧 Chrome Built-in AI requires Chrome 138+:\n• Update to Chrome 138 or later (stable)\n• Or use Chrome Dev/Canary for latest features\n• Then refresh the page";
     }
-    return "⚠️ Chrome " + chromeVersion + " detected but Built-in AI not available.\n\n🔧 To enable Chrome Built-in AI:\n• Go to chrome://flags\n• Search for 'AI' and enable relevant flags\n• Restart Chrome and refresh this page\n\n📝 Note: Summarizer API works in web pages for text summarization.";
+    return "⚠️ Chrome " + chromeVersion + " detected but Built-in AI not available.\n\n🔧 To enable Chrome Built-in AI:\n• Go to chrome://flags\n• Enable: #optimization-guide-on-device-model (set to 'Enabled BypassPerfRequirement')\n• Enable: #prompt-api-for-gemini-nano\n• Enable: #summarization-api-for-gemini-nano\n• Click 'Relaunch' button\n• Download AI model in chrome://components (2GB, takes 5-30 minutes)\n\n📝 Note: Summarizer API works in web pages for text summarization.";
   } else {
     return "🌐 Chrome Built-in AI features require Chrome browser.\n\n📋 Current browser: " + 
            (userAgent.includes('Firefox') ? 'Firefox' :
             userAgent.includes('Safari') ? 'Safari' :
             userAgent.includes('Edg') ? 'Edge' : 'Unknown') +
-           "\n\n🔄 To use AI features:\n• Switch to Chrome 138+ (stable version)\n• Or integrate OpenAI/Claude API for universal browser support\n\n💡 Voice input will still work in your current browser.";
+           "\n\n🔄 To use AI features:\n• Switch to Chrome 138+ (stable version)\n• Enable AI flags: #optimization-guide-on-device-model, #summarization-api-for-gemini-nano\n• Download AI model in chrome://components (2GB)\n• Or integrate OpenAI/Claude API for universal browser support\n\n💡 Voice input will still work in your current browser.";
   }
 }
