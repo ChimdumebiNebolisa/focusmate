@@ -5,14 +5,13 @@ import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
 import { 
   summarizeText, 
   rewriteText, 
-  extractTasks, 
-  translateText
+  extractTasks
 } from '../utils/chromeAI';
 import { saveSession } from '../services/historyService';
 import HistoryPanel from './HistoryPanel';
-import { Mic, Brain, Sparkles, CheckSquare, Globe } from 'lucide-react';
+import { Mic, Brain, Sparkles, CheckSquare } from 'lucide-react';
 
-type ActionType = 'summarize' | 'clean' | 'tasks' | 'translate';
+type ActionType = 'summarize' | 'clean' | 'tasks';
 
 const actions = [
   { 
@@ -20,28 +19,22 @@ const actions = [
     icon: Brain, 
     action: 'summarize' as ActionType, 
     color: 'from-indigo-500 to-purple-600',
-    tooltip: 'Condense text while keeping the core meaning.'
+    tooltip: 'AI-powered text summarization (Chrome 138+).'
   },
   { 
     label: 'Clean', 
     icon: Sparkles, 
     action: 'clean' as ActionType, 
     color: 'from-emerald-500 to-teal-600',
-    tooltip: 'Polish grammar, tone, and structure.'
+    tooltip: '⚠️ Writer API in Early Preview - Not yet available.',
+    isPreview: true
   },
   { 
     label: 'Extract Tasks', 
     icon: CheckSquare, 
     action: 'tasks' as ActionType, 
     color: 'from-orange-500 to-red-600',
-    tooltip: 'Identify key actions and to-dos.'
-  },
-  { 
-    label: 'Translate', 
-    icon: Globe, 
-    action: 'translate' as ActionType, 
-    color: 'from-blue-500 to-cyan-600',
-    tooltip: 'Convert text between languages with style options.'
+    tooltip: 'Pattern-based task detection (no AI required).'
   },
 ];
 
@@ -60,7 +53,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
   const [copySuccess, setCopySuccess] = useState(false);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
-  const [translationMode, setTranslationMode] = useState('academic');
+  const [processingMode, setProcessingMode] = useState('academic');
 
   const {
     transcript,
@@ -72,6 +65,64 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
     interimTranscript,
     confidence
   } = useSpeechRecognition();
+
+  // Keyboard shortcuts
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Only handle shortcuts when not typing in input fields
+      if (event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLInputElement) {
+        return;
+      }
+
+      // Ctrl/Cmd + 1: Summarize
+      if ((event.ctrlKey || event.metaKey) && event.key === '1') {
+        event.preventDefault();
+        if (inputText.trim()) {
+          handleAction('summarize');
+        }
+      }
+      // Ctrl/Cmd + 2: Clean
+      else if ((event.ctrlKey || event.metaKey) && event.key === '2') {
+        event.preventDefault();
+        if (inputText.trim()) {
+          handleAction('clean');
+        }
+      }
+      // Ctrl/Cmd + 3: Extract Tasks
+      else if ((event.ctrlKey || event.metaKey) && event.key === '3') {
+        event.preventDefault();
+        if (inputText.trim()) {
+          handleAction('tasks');
+        }
+      }
+      // Ctrl/Cmd + Enter: Process with last used action or default to summarize
+      else if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+        event.preventDefault();
+        if (inputText.trim()) {
+          handleAction(activeAction || 'summarize');
+        }
+      }
+      // Ctrl/Cmd + C: Copy output
+      else if ((event.ctrlKey || event.metaKey) && event.key === 'c' && outputText) {
+        event.preventDefault();
+        copyOutput();
+      }
+      // Ctrl/Cmd + D: Download output
+      else if ((event.ctrlKey || event.metaKey) && event.key === 'd' && outputText) {
+        event.preventDefault();
+        downloadOutput();
+      }
+      // Escape: Clear all
+      else if (event.key === 'Escape') {
+        event.preventDefault();
+        setInputText('');
+        setOutputText('');
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [inputText, outputText, activeAction]);
 
   // Update input text when speech recognition produces results
   React.useEffect(() => {
@@ -96,16 +147,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
       
       switch (type) {
         case 'summarize':
-          result = await summarizeText(inputText);
+          result = await summarizeText(inputText, processingMode);
           break;
         case 'clean':
-          result = await rewriteText(inputText);
+          result = await rewriteText(inputText, processingMode);
           break;
         case 'tasks':
           result = await extractTasks(inputText);
-          break;
-        case 'translate':
-          result = await translateText(inputText, 'en', translationMode);
           break;
       }
       
@@ -153,6 +201,20 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
     }
   };
 
+  const downloadOutput = () => {
+    if (!outputText) return;
+    
+    const blob = new Blob([outputText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `focusmate-output-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const handleRestoreSession = (input: string, output: string) => {
     setInputText(input);
     setOutputText(output);
@@ -179,7 +241,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
           What's on your mind today?
         </h1>
         <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-10">
-          Let FocusMate help you summarize, clean, or translate your thoughts.
+          Let FocusMate help you summarize, clean, or extract tasks from your thoughts in different styles.
         </p>
       </motion.div>
 
@@ -284,50 +346,64 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
             <div className="flex flex-wrap gap-3 justify-center items-end">
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-3 justify-center">
-                {actions.map(({ label, icon: Icon, action, color, tooltip }) => (
-                  <div key={action} className="relative group">
-                    <motion.button
-                      onClick={() => handleAction(action)}
-                      className={`px-4 py-2 rounded-lg shadow-md hover:shadow-xl transition-all duration-200 flex items-center gap-2 bg-gradient-to-r ${color} text-white font-semibold ${
-                        activeAction === action 
-                          ? 'scale-105 opacity-75' 
-                          : ''
-                      }`}
-                      disabled={!inputText.trim() || isProcessing}
-                      whileHover={{ scale: activeAction !== action ? 1.05 : 1, filter: "brightness(1.2)" }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      {activeAction === action ? (
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      ) : (
-                        <>
-                          <Icon size={18} />
-                          <span className="text-sm font-medium">{label}</span>
-                        </>
-                      )}
-                    </motion.button>
-                    <span className="absolute -top-10 left-1/2 -translate-x-1/2 text-xs bg-gray-800 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-50">
-                      {tooltip}
-                    </span>
-                  </div>
-                ))}
+                {actions.map(({ label, icon: Icon, action, color, tooltip, isPreview }) => {
+                  const shortcutKey = action === 'summarize' ? '1' : 
+                                     action === 'clean' ? '2' : 
+                                     action === 'tasks' ? '3' : '';
+                  return (
+                    <div key={action} className="relative group">
+                      <motion.button
+                        onClick={() => handleAction(action)}
+                        className={`px-4 py-2 rounded-lg shadow-md hover:shadow-xl transition-all duration-200 flex items-center gap-2 bg-gradient-to-r ${color} text-white font-semibold ${
+                          activeAction === action 
+                            ? 'scale-105 opacity-75' 
+                            : ''
+                        } ${isPreview ? 'relative' : ''}`}
+                        disabled={!inputText.trim() || isProcessing}
+                        whileHover={{ scale: activeAction !== action ? 1.05 : 1, filter: "brightness(1.2)" }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {activeAction === action ? (
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <>
+                            <Icon size={18} />
+                            <span className="text-sm font-medium">{label}</span>
+                            <span className="text-xs opacity-75">⌘{shortcutKey}</span>
+                            {isPreview && (
+                              <span className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-400 text-yellow-900 rounded-full text-xs flex items-center justify-center font-bold">
+                                !
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </motion.button>
+                      <span className="absolute -top-12 left-1/2 -translate-x-1/2 text-xs bg-gray-800 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-50">
+                        {tooltip} | Shortcut: ⌘{shortcutKey}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
 
-              {/* Translation Mode Selector */}
-              <div className="flex flex-col items-center">
-                <label className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Translation Mode
-                </label>
-                <select 
-                  value={translationMode}
-                  onChange={(e) => setTranslationMode(e.target.value)}
-                  className="border border-gray-300 dark:border-gray-600 rounded-md px-2 py-1 text-xs focus:ring-2 focus:ring-indigo-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                >
-                  <option value="academic">Academic</option>
-                  <option value="concise">Concise</option>
-                  <option value="creative">Creative</option>
-                  <option value="conversational">Conversational</option>
-                </select>
+              {/* Processing Mode Options */}
+              <div className="flex gap-3">
+                {/* Processing Mode Selector */}
+                <div className="flex flex-col items-center">
+                  <label className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Processing Mode
+                  </label>
+                  <select 
+                    value={processingMode}
+                    onChange={(e) => setProcessingMode(e.target.value)}
+                    className="border border-gray-300 dark:border-gray-600 rounded-md px-2 py-1 text-xs focus:ring-2 focus:ring-indigo-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  >
+                    <option value="academic">Academic</option>
+                    <option value="concise">Concise</option>
+                    <option value="creative">Creative</option>
+                    <option value="conversational">Conversational</option>
+                  </select>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -353,16 +429,25 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Your processed result will appear here.</p>
               </div>
               {outputText && (
-                <button
-                  onClick={copyOutput}
-                  className={`px-3 py-1 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 text-sm font-medium ${
-                    copySuccess 
-                      ? 'bg-green-500 text-white' 
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                  }`}
-                >
-                  {copySuccess ? '✓ Copied!' : '📋 Copy'}
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={copyOutput}
+                    className={`px-3 py-1 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 text-sm font-medium ${
+                      copySuccess 
+                        ? 'bg-green-500 text-white' 
+                        : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                    }`}
+                  >
+                    {copySuccess ? '✓ Copied!' : '📋 Copy'}
+                  </button>
+                  <button
+                    onClick={downloadOutput}
+                    className="px-3 py-1 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 text-sm font-medium bg-blue-500 text-white hover:bg-blue-600"
+                    title="Download as .txt file"
+                  >
+                    💾 Download
+                  </button>
+                </div>
               )}
             </div>
               
@@ -415,7 +500,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
                       Results will appear here
                     </p>
                     <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
-                      Try summarizing, cleaning, extracting tasks, or translating
+                      Try summarizing, cleaning, or extracting tasks in different styles
                     </p>
                   </div>
                 </motion.div>
@@ -424,6 +509,59 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ showHistory, onCloseH
           </motion.div>
         </motion.div>
       </div>
+
+      {/* Keyboard Shortcuts Help */}
+      <motion.div 
+        className="mt-12 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+      >
+        <div className="flex items-center gap-2 mb-4">
+          <svg className="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200">Keyboard Shortcuts</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-blue-700 dark:text-blue-300">Summarize</span>
+              <kbd className="px-2 py-1 bg-blue-200 dark:bg-blue-800 rounded text-xs font-mono">⌘1</kbd>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-blue-700 dark:text-blue-300">Clean Text</span>
+              <kbd className="px-2 py-1 bg-blue-200 dark:bg-blue-800 rounded text-xs font-mono">⌘2</kbd>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-blue-700 dark:text-blue-300">Extract Tasks</span>
+              <kbd className="px-2 py-1 bg-blue-200 dark:bg-blue-800 rounded text-xs font-mono">⌘3</kbd>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-blue-700 dark:text-blue-300">Quick Process</span>
+              <kbd className="px-2 py-1 bg-blue-200 dark:bg-blue-800 rounded text-xs font-mono">⌘⏎</kbd>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-blue-700 dark:text-blue-300">Copy Output</span>
+              <kbd className="px-2 py-1 bg-blue-200 dark:bg-blue-800 rounded text-xs font-mono">⌘C</kbd>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-blue-700 dark:text-blue-300">Download Output</span>
+              <kbd className="px-2 py-1 bg-blue-200 dark:bg-blue-800 rounded text-xs font-mono">⌘D</kbd>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-blue-700 dark:text-blue-300">Clear All</span>
+              <kbd className="px-2 py-1 bg-blue-200 dark:bg-blue-800 rounded text-xs font-mono">Esc</kbd>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-blue-700 dark:text-blue-300">Voice Input</span>
+              <kbd className="px-2 py-1 bg-blue-200 dark:bg-blue-800 rounded text-xs font-mono">Click Mic</kbd>
+            </div>
+          </div>
+        </div>
+      </motion.div>
 
       {/* History Panel */}
       <HistoryPanel

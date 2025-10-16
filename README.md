@@ -1,13 +1,46 @@
-# 🚀 FocusMate
+# 🧠 FocusMate
 
 **Transform your thoughts into clear, actionable content with AI-powered tools**
 
 FocusMate is a modern web application that helps you organize, clean, and enhance your text using Chrome's on-device AI capabilities. Whether you're summarizing notes, cleaning up messy text, extracting tasks, or translating content, FocusMate makes your ideas instantly actionable.
 
 ![FocusMate Hero](https://img.shields.io/badge/FocusMate-AI%20Powered-blue?style=for-the-badge&logo=chrome&logoColor=white)
-![React](https://img.shields.io/badge/React-18+-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![React](https://img.shields.io/badge/React-19+-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5+-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3+-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-7+-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+
+---
+
+## 🧩 **Overview**
+
+FocusMate streamlines how you handle written content.  
+Whether it's an article, a report, or notes — FocusMate uses AI to help you **condense**, **refine**, and **organize** text into actionable insights without needing external APIs or servers.
+
+---
+
+## ⚡ **Core Features**
+
+| Feature | Description |
+|----------|--------------|
+| **Summarize** | Condense long text while preserving the key ideas and structure. |
+| **Clean** | Improve grammar, tone, and readability with one click. |
+| **Extract Tasks** | Identify action items, deadlines, and to-dos from raw text. |
+| **Translate** | Convert text between languages with style options (Academic, Concise, Creative, Conversational). |
+
+No timers. No distractions. Just pure, focused text enhancement.
+
+---
+
+## 🧠 **How It Works**
+
+FocusMate leverages **Chrome's built-in AI capabilities** (Prompt, Summarization, and Editing APIs) to process text **locally in the browser**, ensuring privacy and instant performance.
+
+1. Paste or type your text.  
+2. Choose an operation (Summarize, Clean, Extract Tasks, or Translate).  
+3. Instantly view AI-enhanced output — no backend or API keys required.
+
+---
 
 ## ✨ Features
 
@@ -44,8 +77,9 @@ FocusMate is a modern web application that helps you organize, clean, and enhanc
 ## 🏗️ Tech Stack
 
 ### Frontend
-- **React 18** - Modern UI library with hooks and concurrent features
+- **React 19** - Modern UI library with hooks and concurrent features
 - **TypeScript** - Type-safe development
+- **Vite** - Lightning-fast build tool and dev server
 - **Tailwind CSS** - Utility-first styling
 - **Framer Motion** - Smooth animations and transitions
 - **React Router** - Client-side routing
@@ -61,9 +95,9 @@ FocusMate is a modern web application that helps you organize, clean, and enhanc
 - **Custom AI utilities** - Robust error handling
 
 ### Development Tools
-- **Vite** - Fast build tool and dev server
 - **ESLint** - Code linting and formatting
 - **PostCSS** - CSS processing
+- **Prettier** - Code formatting
 
 ## 🚀 Quick Start
 
@@ -197,23 +231,42 @@ focusmate/
 │   ├── components/          # React components
 │   │   ├── AboutSection.tsx
 │   │   ├── DashboardLayout.tsx
+│   │   ├── Footer.tsx
+│   │   ├── GoogleButton.tsx
+│   │   ├── HistoryPanel.tsx
 │   │   ├── LandingHero.tsx
 │   │   ├── Navbar.tsx
-│   │   └── ...
+│   │   ├── ParticleBackground.tsx
+│   │   ├── SettingsPanel.tsx
+│   │   ├── VoiceMode.tsx
+│   │   └── Workspace.tsx
 │   ├── pages/              # Page components
 │   │   ├── Dashboard.tsx
 │   │   ├── Landing.tsx
+│   │   ├── LandingPage.tsx
 │   │   └── Settings.tsx
 │   ├── utils/              # Utility functions
 │   │   ├── checkAI.ts      # Chrome AI runtime checks
 │   │   ├── chromeAI.ts     # AI integration
 │   │   └── firebaseHelpers.ts
 │   ├── hooks/              # Custom React hooks
+│   │   ├── useAuth.ts
+│   │   └── useSpeechRecognition.ts
 │   ├── context/            # React context providers
+│   │   ├── AuthContext.tsx
+│   │   ├── AuthContextProvider.tsx
+│   │   └── ThemeContext.tsx
 │   ├── services/           # External service integrations
-│   └── routes/             # Route components
+│   │   └── historyService.ts
+│   ├── routes/             # Route components
+│   │   └── ProtectedRoute.tsx
+│   ├── App.tsx             # Main app component
+│   ├── main.tsx            # App entry point
+│   └── firebase.ts         # Firebase configuration
 ├── public/                 # Static assets
 ├── dist/                   # Build output
+├── vite.config.ts          # Vite configuration
+├── tailwind.config.js      # Tailwind configuration
 └── package.json           # Dependencies and scripts
 ```
 
@@ -310,6 +363,17 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 - Firebase team for excellent developer tools
 - React and TypeScript communities
 - All contributors and users
+
+## 🪴 Roadmap
+
+- [x] Add keyboard shortcuts
+- [x] Add export options (copy, download as .txt)
+- [ ] Add history view for recent processed texts
+- [ ] Add "smart combine" mode for multi-step processing
+- [ ] Enhanced Chrome AI API integration as APIs mature
+- [ ] Plugin system for custom AI providers
+- [ ] Batch processing capabilities
+- [ ] Advanced text analytics
 
 ## 📊 Project Status
 

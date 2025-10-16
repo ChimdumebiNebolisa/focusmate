@@ -6,7 +6,7 @@ const AboutSection: React.FC = () => {
   const features = [
     {
       title: "AI-Powered Clarity",
-      desc: "Clean up messy notes or speech with Chrome's on-device AI summarizer and rewriter.",
+      desc: "Summarize text and translate to 7 languages with Chrome's built-in AI (Chrome 138+). Task extraction uses smart pattern matching.",
       icon: Brain,
       color: "from-blue-500 to-indigo-600",
     },

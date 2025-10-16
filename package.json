@@ -1,7 +1,15 @@
 {
   "name": "focusmate",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "An AI-powered text productivity web app that helps users summarize, clean, and extract actionable tasks directly in the browser using Chrome's built-in AI APIs",
+  "keywords": ["ai", "text-processing", "summarization", "chrome-ai", "productivity", "react", "typescript"],
+  "author": "Chimdumebi Nebolisa",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ChimdumebiNebolisa/focusmate.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",

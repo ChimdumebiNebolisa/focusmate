@@ -2,6 +2,9 @@
  * Chrome AI Runtime Check Utility
  * Provides runtime validation for Chrome AI API availability
  * Updated to use the new Chrome Built-in AI APIs (non-deprecated)
+ * 
+ * As of September 2025, window.ai has been deprecated in Chrome.
+ * The official replacement is LanguageModel, accessible via self.ai.languageModel.
  */
 
 interface AILanguageModel {
@@ -82,12 +85,15 @@ interface ChromeAI {
 
 declare global {
   // The Chrome Built-in AI APIs are available as global 'ai' or 'self.ai'
-  // NOT as window.ai (that is deprecated)
+  // NOT as window.ai (that is deprecated as of September 2025)
+  // The official replacement is LanguageModel, accessible via self.ai.languageModel
   const ai: ChromeAI | undefined;
 }
 
 /**
  * Check if Chrome AI APIs are available at runtime
+ * NOTE: As of Chrome 138+, only Summarizer and Translator APIs work in web pages.
+ * Language Model API only works in Chrome Extensions, Writer API is not yet released.
  * @returns {boolean} true if at least one Chrome AI API is available
  */
 export function checkChromeAI(): boolean {
@@ -104,9 +110,10 @@ export function checkChromeAI(): boolean {
     hasAPI: !!chromeAI,
     apis: chromeAI ? {
       summarizer: !!chromeAI.summarizer,
+      translator: !!chromeAI.translator,
+      // These don't work in web pages (only extensions or not released yet):
       writer: !!chromeAI.writer,
-      languageModel: !!chromeAI.languageModel,
-      translator: !!chromeAI.translator
+      languageModel: !!chromeAI.languageModel
     } : null
   });
   
@@ -119,13 +126,11 @@ export function checkChromeAI(): boolean {
     return false;
   }
 
-  // Check if at least one API is available
+  // Only check APIs that actually work in web pages (Chrome 138+)
   const hasSummarizer = !!chromeAI.summarizer;
-  const hasWriter = !!chromeAI.writer;
-  const hasLanguageModel = !!chromeAI.languageModel;
   const hasTranslator = !!chromeAI.translator;
 
-  const hasAnyAPI = hasSummarizer || hasWriter || hasLanguageModel || hasTranslator;
+  const hasAnyAPI = hasSummarizer || hasTranslator;
 
   if (!hasAnyAPI) {
     // Only show warning once per session
@@ -143,12 +148,12 @@ export function checkChromeAI(): boolean {
  * Display a styled warning when Chrome AI is not supported
  */
 function showAIWarning(): void {
-  const warningMessage = `🔧 Chrome AI API not supported on this browser.
+  const warningMessage = `🔧 Chrome AI API not available.
 
 To use AI features:
-• Use Chrome Canary or Chrome Dev (latest)
-• Enable Chrome AI features in chrome://flags
-• Ensure you're on a supported platform`;
+• Update to Chrome 138+ (stable version)
+• Some APIs require chrome://flags enabled
+• Note: Only Summarizer & Translator work in web pages`;
 
   // Create a styled alert container
   const alertContainer = document.createElement('div');
@@ -246,20 +251,26 @@ export function getChromeAIStatus(): {
   languageModel: boolean;
   translator: boolean;
   browser: string;
+  chromeVersion: string;
 } {
   const isChrome = navigator.userAgent.includes('Chrome') && !navigator.userAgent.includes('Edg');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const chromeAI = ('ai' in self ? (self as any).ai : undefined) as ChromeAI | undefined;
   
+  // Extract Chrome version
+  const chromeVersionMatch = navigator.userAgent.match(/Chrome\/(\d+)/);
+  const chromeVersion = chromeVersionMatch ? chromeVersionMatch[1] : 'Unknown';
+  
   return {
     available: checkChromeAI(),
     summarizer: !!(chromeAI?.summarizer),
-    writer: !!(chromeAI?.writer),
-    languageModel: !!(chromeAI?.languageModel),
+    writer: !!(chromeAI?.writer), // Not available in web pages yet
+    languageModel: !!(chromeAI?.languageModel), // Only works in Chrome Extensions
     translator: !!(chromeAI?.translator),
     browser: isChrome ? 'Chrome' : navigator.userAgent.includes('Firefox') ? 'Firefox' : 
              navigator.userAgent.includes('Safari') ? 'Safari' :
-             navigator.userAgent.includes('Edg') ? 'Edge' : 'Unknown'
+             navigator.userAgent.includes('Edg') ? 'Edge' : 'Unknown',
+    chromeVersion
   };
 }
 
