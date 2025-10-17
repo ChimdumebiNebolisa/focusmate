@@ -620,3 +620,4 @@ export function getQuickStatus(): string {
   if (!hasAI) return '⚠️ Chrome AI not available';
   return '✅ Chrome AI ready';
 }
+
