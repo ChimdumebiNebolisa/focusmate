@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Error Handling Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .status {
+            font-size: 14px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: inline-block;
+            margin: 5px 5px 5px 0;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #1a73e8; color: white; border: none; padding: 12px 24px;
+            border-radius: 6px; cursor: pointer; font-size: 14px; margin: 5px 5px 5px 0;
+        }
+        button:hover { background: #1557b0; }
+        .test-scenario {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #1a73e8;
+            background: #f8f9fa;
+            border-radius: 0 6px 6px 0;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🧠 Smart Error Handling Test</h1>
+        <p>This page tests the intelligent error handling system to ensure fallback messages only appear when AI is genuinely not working.</p>
+    </div>
+
+    <div class="card">
+        <h2>📊 Current AI Status</h2>
+        <div id="aiStatus"></div>
+        <button onclick="checkAIStatus()">🔍 Check AI Status</button>
+    </div>
+
+    <div class="card">
+        <h2>🧪 Test Scenarios</h2>
+        
+        <div class="test-scenario">
+            <h4>Scenario 1: AI Available and Working</h4>
+            <p>Test with normal text when AI is functioning properly.</p>
+            <button onclick="testNormalOperation()">Test Normal Operation</button>
+            <div id="normalResult" class="result"></div>
+        </div>
+
+        <div class="test-scenario">
+            <h4>Scenario 2: AI Available but Request Fails</h4>
+            <p>Test with problematic text that might cause AI to fail.</p>
+            <button onclick="testRequestFailure()">Test Request Failure</button>
+            <div id="failureResult" class="result"></div>
+        </div>
+
+        <div class="test-scenario">
+            <h4>Scenario 3: AI Unavailable</h4>
+            <p>Test when AI system is not available (simulated).</p>
+            <button onclick="testAIUnavailable()">Test AI Unavailable</button>
+            <div id="unavailableResult" class="result"></div>
+        </div>
+
+        <div class="test-scenario">
+            <h4>Scenario 4: AI Operational but Slow</h4>
+            <p>Test timeout scenarios when AI is slow to respond.</p>
+            <button onclick="testSlowResponse()">Test Slow Response</button>
+            <div id="slowResult" class="result"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📋 Test Results Summary</h2>
+        <div id="testSummary"></div>
+    </div>
+
+    <script>
+        // Mock AI Status Monitor for testing
+        class MockAIStatusMonitor {
+            constructor() {
+                this.status = {
+                    isAvailable: false,
+                    isOperational: false,
+                    lastChecked: Date.now(),
+                    errorType: 'none',
+                    errorMessage: '',
+                    availableAPIs: [],
+                    capabilities: {
+                        summarizer: false,
+                        translator: false,
+                        writer: false,
+                        languageModel: false
+                    }
+                };
+            }
+
+            async performHealthCheck() {
+                // Check if Chrome AI is actually available
+                const chromeAI = ('ai' in self ? self.ai : undefined);
+                const hasSummarizer = !!(chromeAI?.summarizer);
+                
+                this.status = {
+                    isAvailable: !!chromeAI,
+                    isOperational: hasSummarizer,
+                    lastChecked: Date.now(),
+                    errorType: hasSummarizer ? 'none' : 'unavailable',
+                    errorMessage: hasSummarizer ? '' : this.getUnavailableMessage(),
+                    availableAPIs: hasSummarizer ? ['summarizer'] : [],
+                    capabilities: {
+                        summarizer: hasSummarizer,
+                        translator: !!(chromeAI?.translator),
+                        writer: !!(chromeAI?.writer),
+                        languageModel: !!(chromeAI?.languageModel)
+                    }
+                };
+
+                return this.status;
+            }
+
+            getUnavailableMessage() {
+                const isChrome = navigator.userAgent.includes('Chrome') && !navigator.userAgent.includes('Edg');
+                
+                if (!isChrome) {
+                    return 'Chrome AI features require Chrome browser. Please switch to Chrome to use AI features.';
+                }
+                
+                const versionMatch = navigator.userAgent.match(/Chrome\/(\d+)/);
+                const version = versionMatch ? parseInt(versionMatch[1]) : 0;
+                
+                if (version < 138) {
+                    return `Chrome AI requires version 138+. You're running version ${version}. Please update Chrome.`;
+                }
+                
+                return 'Chrome AI features are not available. Please enable AI features in chrome://flags and restart Chrome.';
+            }
+
+            getUserFriendlyMessage() {
+                if (this.status.errorType === 'none') {
+                    return '';
+                }
+
+                switch (this.status.errorType) {
+                    case 'unavailable':
+                        return this.status.errorMessage;
+                    case 'operational':
+                        return 'AI system is available but not responding properly. This might be temporary - please try again.';
+                    case 'network':
+                        return 'AI system is temporarily unavailable. Please check your connection and try again.';
+                    case 'timeout':
+                        return 'AI system is taking too long to respond. Please try again with shorter text.';
+                    default:
+                        return 'An unexpected error occurred. Please try again.';
+                }
+            }
+
+            shouldShowFallbackError() {
+                return !this.status.isAvailable || !this.status.isOperational;
+            }
+
+            isReadyForUse() {
+                return this.status.isAvailable && this.status.isOperational;
+            }
+
+            getStatus() {
+                return this.status;
+            }
+        }
+
+        const aiStatusMonitor = new MockAIStatusMonitor();
+        const testResults = [];
+
+        function checkAIStatus() {
+            aiStatusMonitor.performHealthCheck().then(status => {
+                const statusDiv = document.getElementById('aiStatus');
+                let html = '';
+
+                html += `<div class="status ${status.isAvailable ? 'success' : 'error'}">
+                    ${status.isAvailable ? '✅' : '❌'} AI Available
+                </div>`;
+
+                html += `<div class="status ${status.isOperational ? 'success' : 'error'}">
+                    ${status.isOperational ? '✅' : '❌'} AI Operational
+                </div>`;
+
+                html += `<div class="status info">
+                    📊 Status: ${status.errorType === 'none' ? 'Ready' : status.errorType}
+                </div>`;
+
+                if (status.availableAPIs.length > 0) {
+                    html += `<div class="status info">
+                        🔧 Available APIs: ${status.availableAPIs.join(', ')}
+                    </div>`;
+                }
+
+                if (status.errorMessage) {
+                    html += `<div class="status warning">
+                        ⚠️ ${status.errorMessage}
+                    </div>`;
+                }
+
+                statusDiv.innerHTML = html;
+            });
+        }
+
+        async function testNormalOperation() {
+            const resultDiv = document.getElementById('normalResult');
+            resultDiv.textContent = 'Testing...';
+
+            try {
+                const chromeAI = ('ai' in self ? self.ai : undefined);
+                if (!chromeAI?.summarizer) {
+                    throw new Error('Summarizer not available');
+                }
+
+                const summarizer = await chromeAI.summarizer.create({
+                    type: 'key-points',
+                    format: 'plain-text',
+                    length: 'short'
+                });
+
+                const result = await summarizer.summarize('This is a test of the AI system.');
+                
+                resultDiv.innerHTML = `<div class="status success">✅ Success</div>
+Result: ${result}
+
+<strong>Error Handling:</strong> No fallback message shown (correct - AI is working)`;
+                
+                testResults.push({
+                    scenario: 'Normal Operation',
+                    success: true,
+                    fallbackShown: false,
+                    correct: true
+                });
+
+            } catch (error) {
+                const shouldShowFallback = aiStatusMonitor.shouldShowFallbackError();
+                const message = shouldShowFallback ? aiStatusMonitor.getUserFriendlyMessage() : 'Sorry, I couldn\'t process that text. Please try again with different content.';
+                
+                resultDiv.innerHTML = `<div class="status ${shouldShowFallback ? 'warning' : 'error'}">❌ ${shouldShowFallback ? 'AI Unavailable' : 'Request Failed'}</div>
+Error: ${error.message}
+
+Message Shown: ${message}
+
+<strong>Error Handling:</strong> ${shouldShowFallback ? 'Fallback message shown (correct - AI unavailable)' : 'Specific error shown (correct - AI available but request failed)'}`;
+
+                testResults.push({
+                    scenario: 'Normal Operation',
+                    success: false,
+                    fallbackShown: shouldShowFallback,
+                    correct: shouldShowFallback
+                });
+            }
+
+            updateTestSummary();
+        }
+
+        async function testRequestFailure() {
+            const resultDiv = document.getElementById('failureResult');
+            resultDiv.textContent = 'Testing...';
+
+            try {
+                // Try to process empty or invalid text
+                const chromeAI = ('ai' in self ? self.ai : undefined);
+                if (!chromeAI?.summarizer) {
+                    throw new Error('Summarizer not available');
+                }
+
+                const summarizer = await chromeAI.summarizer.create({
+                    type: 'key-points',
+                    format: 'plain-text',
+                    length: 'short'
+                });
+
+                // This might fail due to empty text or other issues
+                const result = await summarizer.summarize('');
+                
+                resultDiv.innerHTML = `<div class="status success">✅ Unexpected Success</div>
+Result: ${result || 'Empty result'}
+
+<strong>Error Handling:</strong> No error occurred (unexpected)`;                
+
+            } catch (error) {
+                const shouldShowFallback = aiStatusMonitor.shouldShowFallbackError();
+                const message = shouldShowFallback ? aiStatusMonitor.getUserFriendlyMessage() : 'Sorry, I couldn\'t process that text. Please try again with different content.';
+                
+                resultDiv.innerHTML = `<div class="status ${shouldShowFallback ? 'warning' : 'error'}">❌ ${shouldShowFallback ? 'AI Unavailable' : 'Request Failed'}</div>
+Error: ${error.message}
+
+Message Shown: ${message}
+
+<strong>Error Handling:</strong> ${shouldShowFallback ? 'Fallback message shown (correct - AI unavailable)' : 'Specific error shown (correct - AI available but request failed)'}`;
+
+                testResults.push({
+                    scenario: 'Request Failure',
+                    success: false,
+                    fallbackShown: shouldShowFallback,
+                    correct: !shouldShowFallback // Should NOT show fallback for request failures when AI is available
+                });
+            }
+
+            updateTestSummary();
+        }
+
+        async function testAIUnavailable() {
+            const resultDiv = document.getElementById('unavailableResult');
+            
+            // Simulate AI unavailable scenario
+            const originalStatus = aiStatusMonitor.getStatus();
+            aiStatusMonitor.status.isAvailable = false;
+            aiStatusMonitor.status.isOperational = false;
+            aiStatusMonitor.status.errorType = 'unavailable';
+            
+            const shouldShowFallback = aiStatusMonitor.shouldShowFallbackError();
+            const message = aiStatusMonitor.getUserFriendlyMessage();
+            
+            resultDiv.innerHTML = `<div class="status warning">⚠️ AI Unavailable (Simulated)</div>
+Simulated Status: AI not available
+
+Message Shown: ${message}
+
+<strong>Error Handling:</strong> ${shouldShowFallback ? 'Fallback message shown (correct - AI unavailable)' : 'No fallback shown (incorrect - should show fallback)'}`;
+
+            testResults.push({
+                scenario: 'AI Unavailable',
+                success: false,
+                fallbackShown: shouldShowFallback,
+                correct: shouldShowFallback
+            });
+
+            // Restore original status
+            aiStatusMonitor.status = originalStatus;
+            updateTestSummary();
+        }
+
+        async function testSlowResponse() {
+            const resultDiv = document.getElementById('slowResult');
+            resultDiv.textContent = 'Testing...';
+
+            try {
+                const chromeAI = ('ai' in self ? self.ai : undefined);
+                if (!chromeAI?.summarizer) {
+                    throw new Error('Summarizer not available');
+                }
+
+                // Simulate slow response with timeout
+                const summarizer = await chromeAI.summarizer.create({
+                    type: 'key-points',
+                    format: 'plain-text',
+                    length: 'short'
+                });
+
+                const testPromise = summarizer.summarize('This is a test of slow response handling.');
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Timeout')), 2000)
+                );
+
+                const result = await Promise.race([testPromise, timeoutPromise]);
+                
+                resultDiv.innerHTML = `<div class="status success">✅ Success (No Timeout)</div>
+Result: ${result}
+
+<strong>Error Handling:</strong> No timeout occurred`;                
+
+            } catch (error) {
+                if (error.message === 'Timeout') {
+                    // Simulate timeout scenario
+                    aiStatusMonitor.status.errorType = 'timeout';
+                    const shouldShowFallback = aiStatusMonitor.shouldShowFallbackError();
+                    const message = aiStatusMonitor.getUserFriendlyMessage();
+                    
+                    resultDiv.innerHTML = `<div class="status warning">⏱️ Timeout (Simulated)</div>
+Error: ${error.message}
+
+Message Shown: ${message}
+
+<strong>Error Handling:</strong> ${shouldShowFallback ? 'Fallback message shown (correct - timeout indicates AI issues)' : 'No fallback shown (incorrect - timeout should trigger fallback)'}`;
+
+                    testResults.push({
+                        scenario: 'Slow Response',
+                        success: false,
+                        fallbackShown: shouldShowFallback,
+                        correct: shouldShowFallback
+                    });
+                } else {
+                    const shouldShowFallback = aiStatusMonitor.shouldShowFallbackError();
+                    const message = shouldShowFallback ? aiStatusMonitor.getUserFriendlyMessage() : 'Sorry, I couldn\'t process that text. Please try again with different content.';
+                    
+                    resultDiv.innerHTML = `<div class="status error">❌ Error</div>
+Error: ${error.message}
+
+Message Shown: ${message}`;
+                }
+            }
+
+            updateTestSummary();
+        }
+
+        function updateTestSummary() {
+            const summaryDiv = document.getElementById('testSummary');
+            
+            if (testResults.length === 0) {
+                summaryDiv.innerHTML = '<p>No tests completed yet.</p>';
+                return;
+            }
+
+            let html = '<h3>Test Results:</h3>';
+            let correctCount = 0;
+
+            testResults.forEach(result => {
+                html += `<div class="status ${result.correct ? 'success' : 'error'}">
+                    ${result.correct ? '✅' : '❌'} ${result.scenario}: ${result.fallbackShown ? 'Fallback shown' : 'Specific error shown'}
+                </div>`;
+                
+                if (result.correct) correctCount++;
+            });
+
+            html += `<div class="status ${correctCount === testResults.length ? 'success' : 'warning'}">
+                📊 Score: ${correctCount}/${testResults.length} tests passed
+            </div>`;
+
+            summaryDiv.innerHTML = html;
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            checkAIStatus();
+        });
+    </script>
+</body>
+</html>

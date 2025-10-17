@@ -1,205 +1,106 @@
 /**
  * Chrome AI Integration Utilities
  * Integrates with Chrome's on-device AI APIs for text processing
+ * Updated to use the new Chrome Built-in AI APIs (non-deprecated)
+ * 
+ * As of September 2025, window.ai has been deprecated in Chrome.
+ * The official replacement is LanguageModel, accessible via self.ai.languageModel.
  */
 
-// Type declarations for Chrome AI API
-declare global {
-  interface Window {
-    ai?: {
-      summarizer?: {
-        create(): Promise<{
-          run(input: { text: string }): Promise<{ result: string }>;
-        }>;
-      };
-      rewriter?: {
-        create(): Promise<{
-          run(input: { text: string; context?: string }): Promise<{ result: string }>;
-        }>;
-      };
-      prompt?: {
-        create(): Promise<{
-          run(input: { prompt: string }): Promise<{ result: string }>;
-        }>;
-      };
-      translator?: {
-        create(): Promise<{
-          run(input: { text: string; targetLanguage: string }): Promise<{ result: string }>;
-        }>;
-      };
-    };
+import { checkChromeAI } from './checkAI';
+import { aiStatusMonitor } from './aiStatusMonitor';
+
+/**
+ * Helper to get the Chrome AI object
+ * Accesses self.ai (the Chrome Built-in AI APIs)
+ * As of September 2025, window.ai has been deprecated in Chrome. 
+ * The official replacement is LanguageModel, accessible via self.ai.languageModel.
+ */
+function getChromeAI() {
+  // Feature detection for Chrome Built-in AI APIs
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const chromeAI = (self as any).ai;
+  
+  if (!chromeAI?.summarizer) {
+    console.warn("Summarizer API not available. Requires Chrome 138+ with AI features enabled.");
+    return undefined;
   }
+  
+  return chromeAI;
 }
 
 /**
- * Summarizes the input text using Chrome AI
+ * Summarizes the input text using Chrome AI with intelligent error handling
  */
-export async function summarizeText(input: string): Promise<string> {
+export async function summarizeText(input: string, mode: string = 'academic'): Promise<string> {
+  if (!input.trim()) {
+    return "Please provide text to summarize.";
+  }
+
+  // Check AI status before attempting operation
+  await aiStatusMonitor.performHealthCheck();
+  
+  if (!aiStatusMonitor.isReadyForUse()) {
+    // Only show fallback error if AI is genuinely not working
+    return aiStatusMonitor.getUserFriendlyMessage();
+  }
+
   try {
-    if (!input.trim()) {
-      return "Please provide text to summarize.";
+    const chromeAI = getChromeAI();
+    if (!chromeAI?.summarizer) {
+      throw new Error('Summarizer API not available');
     }
-
-    if (!window.ai?.summarizer) {
-      return "🔧 Chrome AI API not supported on this browser.\n\nTo use AI features:\n• Use Chrome browser (latest version)\n• Enable Chrome AI features in settings\n• Ensure you're on a supported platform";
-    }
-
-    const summarizer = await window.ai.summarizer.create();
-    const result = await summarizer.run({ text: input });
     
-    if (!result?.result) {
+    // Create context based on processing mode
+    const modeContexts = {
+      academic: "Summarize this text in an academic, formal style suitable for scholarly writing.",
+      concise: "Summarize this text in a concise, clear manner while preserving key information.",
+      creative: "Summarize this text with creative flair, maintaining the original's artistic expression.",
+      conversational: "Summarize this text in a natural, conversational tone as if speaking to a friend."
+    };
+
+    const context = modeContexts[mode as keyof typeof modeContexts] || modeContexts.academic;
+    
+    const summarizer = await chromeAI.summarizer.create({
+      type: 'key-points',
+      format: 'plain-text',
+      length: 'medium'
+    });
+    
+    // Add mode context as a prefix to give guidance
+    const textWithContext = `${context}\n\n${input}`;
+    const result = await summarizer.summarize(textWithContext);
+    
+    if (!result) {
       return "No summary generated. Please try again with different text.";
     }
     
-    return result.result;
+    return result;
   } catch (error) {
-    console.error('Summarizer error:', error);
+    console.error('Summarization error:', error);
     
-    if (error instanceof Error) {
-      if (error.message.includes('quota')) {
-        return "⚠️ API quota exceeded. Please try again later.";
-      }
-      if (error.message.includes('permission')) {
-        return "🔒 Permission denied. Please check Chrome settings.";
-      }
+    // Check if this is a genuine AI failure or just a temporary issue
+    const currentStatus = aiStatusMonitor.getStatus();
+    
+    if (currentStatus.isAvailable && currentStatus.isOperational) {
+      // AI is available but this specific request failed - don't show fallback
+      return "Sorry, I couldn't process that text. Please try again with different content.";
+    } else {
+      // AI is genuinely not working - show appropriate fallback message
+      return aiStatusMonitor.getUserFriendlyMessage();
     }
-    
-    return "❌ Error: Failed to summarize text. Please try again or check your browser compatibility.";
   }
 }
 
-/**
- * Rewrites the input text using Chrome AI
- */
-export async function rewriteText(input: string): Promise<string> {
-  try {
-    if (!input.trim()) {
-      return "Please provide text to clean and rewrite.";
-    }
 
-    if (!window.ai?.rewriter) {
-      return "🔧 Chrome AI API not supported on this browser.\n\nTo use AI features:\n• Use Chrome browser (latest version)\n• Enable Chrome AI features in settings\n• Ensure you're on a supported platform";
-    }
 
-    const rewriter = await window.ai.rewriter.create();
-    const result = await rewriter.run({ 
-      text: input, 
-      context: "Simplify and clarify this text while maintaining its meaning. Make it more readable and professional." 
-    });
-    
-    if (!result?.result) {
-      return "No rewritten text generated. Please try again with different text.";
-    }
-    
-    return result.result;
-  } catch (error) {
-    console.error('Rewriter error:', error);
-    
-    if (error instanceof Error) {
-      if (error.message.includes('quota')) {
-        return "⚠️ API quota exceeded. Please try again later.";
-      }
-      if (error.message.includes('permission')) {
-        return "🔒 Permission denied. Please check Chrome settings.";
-      }
-    }
-    
-    return "❌ Error: Failed to rewrite text. Please try again or check your browser compatibility.";
-  }
-}
 
-/**
- * Extracts tasks from the input text using Chrome AI
- */
-export async function extractTasks(input: string): Promise<string> {
-  try {
-    if (!input.trim()) {
-      return "Please provide text to extract tasks from.";
-    }
-
-    if (!window.ai?.prompt) {
-      return "🔧 Chrome AI API not supported on this browser.\n\nTo use AI features:\n• Use Chrome browser (latest version)\n• Enable Chrome AI features in settings\n• Ensure you're on a supported platform";
-    }
-
-    const prompt = await window.ai.prompt.create();
-    const result = await prompt.run({ 
-      prompt: `Extract actionable tasks from the following text. Format them as a numbered list with clear, specific actions:\n\n${input}\n\nIf no tasks are found, respond with "No actionable tasks identified."` 
-    });
-    
-    if (!result?.result) {
-      return "No tasks extracted. Please try again with different text.";
-    }
-    
-    return result.result;
-  } catch (error) {
-    console.error('Task extraction error:', error);
-    
-    if (error instanceof Error) {
-      if (error.message.includes('quota')) {
-        return "⚠️ API quota exceeded. Please try again later.";
-      }
-      if (error.message.includes('permission')) {
-        return "🔒 Permission denied. Please check Chrome settings.";
-      }
-    }
-    
-    return "❌ Error: Failed to extract tasks. Please try again or check your browser compatibility.";
-  }
-}
-
-/**
- * Translates the input text using Chrome AI
- */
-export async function translateText(input: string, targetLang: string = "en"): Promise<string> {
-  try {
-    if (!input.trim()) {
-      return "Please provide text to translate.";
-    }
-
-    if (!window.ai?.translator) {
-      return "🔧 Chrome AI API not supported on this browser.\n\nTo use AI features:\n• Use Chrome browser (latest version)\n• Enable Chrome AI features in settings\n• Ensure you're on a supported platform";
-    }
-
-    const translator = await window.ai.translator.create();
-    const result = await translator.run({ 
-      text: input, 
-      targetLanguage: targetLang 
-    });
-    
-    if (!result?.result) {
-      return "No translation generated. Please try again with different text.";
-    }
-    
-    return result.result;
-  } catch (error) {
-    console.error('Translator error:', error);
-    
-    if (error instanceof Error) {
-      if (error.message.includes('quota')) {
-        return "⚠️ API quota exceeded. Please try again later.";
-      }
-      if (error.message.includes('permission')) {
-        return "🔒 Permission denied. Please check Chrome settings.";
-      }
-      if (error.message.includes('language')) {
-        return "🌍 Unsupported language. Please try a different target language.";
-      }
-    }
-    
-    return "❌ Error: Failed to translate text. Please try again or check your browser compatibility.";
-  }
-}
 
 /**
  * Check if Chrome AI APIs are available
  */
 export function isChromeAIAvailable(): boolean {
-  return !!(
-    window.ai?.summarizer && 
-    window.ai?.rewriter && 
-    window.ai?.prompt && 
-    window.ai?.translator
-  );
+  return checkChromeAI();
 }
 
 /**
@@ -208,17 +109,26 @@ export function isChromeAIAvailable(): boolean {
 export function getBrowserInfo(): string {
   const userAgent = navigator.userAgent;
   const isChrome = userAgent.includes('Chrome') && !userAgent.includes('Edg');
-  const isSupported = isChromeAIAvailable();
+  const chromeVersionMatch = userAgent.match(/Chrome\/(\d+)/);
+  const chromeVersion = chromeVersionMatch ? parseInt(chromeVersionMatch[1]) : 0;
+  const isSupported = checkChromeAI();
+  
+  const chromeAI = getChromeAI();
   
   if (isSupported) {
-    return "✅ Chrome AI features are available and ready to use!\n\n🎯 All AI functions are working:\n• Text summarization\n• Text rewriting\n• Task extraction\n• Translation";
+    return "✅ Chrome Built-in AI features detected!\n\n🎯 Available AI functions:\n" +
+           (chromeAI?.summarizer ? "• ✅ Text summarization (Summarizer API)\n" : "") +
+           "\n💡 Chrome version: " + chromeVersion;
   } else if (isChrome) {
-    return "⚠️ Chrome detected but AI features not available.\n\n🔧 To enable Chrome AI:\n• Update to latest Chrome version\n• Enable AI features in Chrome settings\n• Check if your device supports AI features\n• Try refreshing the page";
+    if (chromeVersion < 138) {
+      return "⚠️ Chrome version " + chromeVersion + " detected.\n\n🔧 Chrome Built-in AI requires Chrome 138+:\n• Update to Chrome 138 or later (stable)\n• Or use Chrome Dev/Canary for latest features\n• Then refresh the page";
+    }
+    return "⚠️ Chrome " + chromeVersion + " detected but Built-in AI not available.\n\n🔧 To enable Chrome Built-in AI:\n• Go to chrome://flags\n• Enable: #optimization-guide-on-device-model (set to 'Enabled BypassPerfRequirement')\n• Enable: #prompt-api-for-gemini-nano\n• Enable: #summarization-api-for-gemini-nano\n• Click 'Relaunch' button\n• Download AI model in chrome://components (2GB, takes 5-30 minutes)\n\n📝 Note: Summarizer API works in web pages for text summarization.";
   } else {
-    return "🌐 Chrome AI features require Chrome browser.\n\n📋 Current browser: " + 
+    return "🌐 Chrome Built-in AI features require Chrome browser.\n\n📋 Current browser: " + 
            (userAgent.includes('Firefox') ? 'Firefox' :
             userAgent.includes('Safari') ? 'Safari' :
             userAgent.includes('Edg') ? 'Edge' : 'Unknown') +
-           "\n\n🔄 Please switch to Chrome for full AI functionality.\n\n💡 Voice input will still work in your current browser.";
+           "\n\n🔄 To use AI features:\n• Switch to Chrome 138+ (stable version)\n• Enable AI flags: #optimization-guide-on-device-model, #summarization-api-for-gemini-nano\n• Download AI model in chrome://components (2GB)\n• Or integrate OpenAI/Claude API for universal browser support\n\n💡 Voice input will still work in your current browser.";
   }
 }
