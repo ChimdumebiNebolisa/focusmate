@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Github } from 'lucide-react';
 
 const Footer: React.FC = () => {

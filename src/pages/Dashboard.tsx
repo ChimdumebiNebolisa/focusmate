@@ -9,7 +9,7 @@ import { saveSession, loadSession, clearSession, type SessionData } from '../uti
 import { readFileAsText, triggerFileUpload } from '../utils/fileUpload';
 import { aiStatusMonitor } from '../utils/aiStatusMonitor';
 import { Mic, Brain, Sun, Moon, Upload, Copy, Download, Trash2, ArrowLeft } from 'lucide-react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 type ActionType = 'summarize';
 
@@ -25,7 +25,6 @@ const actions = [
 
 const Dashboard: React.FC = () => {
   const { isDark, toggleTheme } = useTheme();
-  const navigate = useNavigate();
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
