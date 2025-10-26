@@ -621,3 +621,4 @@ export function getQuickStatus(): string {
   return '✅ Chrome AI ready';
 }
 
+

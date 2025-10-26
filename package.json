@@ -3,7 +3,15 @@
   "private": true,
   "version": "1.0.0",
   "description": "An AI-powered text productivity web app that helps users summarize, clean, and extract actionable tasks directly in the browser using Chrome's built-in AI APIs",
-  "keywords": ["ai", "text-processing", "summarization", "chrome-ai", "productivity", "react", "typescript"],
+  "keywords": [
+    "ai",
+    "text-processing",
+    "summarization",
+    "chrome-ai",
+    "productivity",
+    "react",
+    "typescript"
+  ],
   "author": "Chimdumebi Nebolisa",
   "license": "MIT",
   "repository": {
@@ -22,6 +30,7 @@
     "lucide-react": "^0.544.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-router-dom": "^7.9.4",
     "tailwindcss": "^3.4.18"
   },
   "devDependencies": {
@@ -29,6 +38,7 @@
     "@types/node": "^24.6.0",
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
+    "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react": "^5.0.4",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.37.0",
