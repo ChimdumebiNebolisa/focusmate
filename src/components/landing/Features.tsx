@@ -5,8 +5,8 @@ import { Shield, Mic, Sparkles, Keyboard } from 'lucide-react';
 const features = [
   {
     icon: Shield,
-    title: 'On-Device AI Processing',
-    description: 'All processing happens locally using Chrome\'s built-in AI—no data leaves your device.',
+    title: 'Flexible AI Processing',
+    description: 'Choose between Chrome\'s on-device AI or cloud-based Mistral AI for text processing that fits your needs.',
     color: 'from-blue-500 to-blue-600',
   },
   {
@@ -76,5 +76,6 @@ const Features: React.FC = () => {
 };
 
 export default Features;
+
 
 

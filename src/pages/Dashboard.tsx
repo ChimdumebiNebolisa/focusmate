@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
+import { useAIProvider } from '../context/AIProviderContext';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
 import { 
   summarizeText
 } from '../utils/chromeAI';
+import { summarizeTextWithMistral, isMistralAIConfigured } from '../utils/mistralAI';
 import { saveSession, loadSession, clearSession, type SessionData } from '../utils/localStorage';
 import { readFileAsText, triggerFileUpload } from '../utils/fileUpload';
 import { aiStatusMonitor } from '../utils/aiStatusMonitor';
@@ -25,6 +27,7 @@ const actions = [
 
 const Dashboard: React.FC = () => {
   const { isDark, toggleTheme } = useTheme();
+  const { provider, toggleProvider } = useAIProvider();
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -90,7 +93,7 @@ const Dashboard: React.FC = () => {
     }
   }, [transcript, listening]);
 
-  // Keyboard shortcuts
+  // Keyboard shortcuts - need to include helper functions in scope
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Only handle shortcuts when not typing in input fields
@@ -131,10 +134,23 @@ const Dashboard: React.FC = () => {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputText, outputText, activeAction]);
 
   const handleAction = async (type: ActionType) => {
     if (!inputText.trim()) {
+      return;
+    }
+
+    // Check Mistral AI configuration if selected
+    if (provider === 'mistral' && !isMistralAIConfigured()) {
+      setOutputText('Mistral AI requires an API key. Please configure your OpenRouter API key in the .env file. You can switch to Chrome AI using the toggle above.');
+      return;
+    }
+
+    // Check Chrome AI availability if selected
+    if (provider === 'chrome' && !aiStatusMonitor.isReadyForUse()) {
+      setOutputText('Chrome AI is not available. Please switch to Mistral AI using the toggle above, or set up Chrome AI.');
       return;
     }
 
@@ -146,13 +162,17 @@ const Dashboard: React.FC = () => {
       let result = '';
       
       if (type === 'summarize') {
-        result = await summarizeText(inputText, processingMode);
+        if (provider === 'chrome') {
+          result = await summarizeText(inputText, processingMode);
+        } else {
+          result = await summarizeTextWithMistral(inputText, processingMode);
+        }
       }
       
       setOutputText(result);
 
       // Show success message only for actual successful operations
-      if (result && !aiStatusMonitor.shouldShowFallbackError()) {
+      if (result && (provider === 'mistral' || !aiStatusMonitor.shouldShowFallbackError())) {
         setSuccessMessage(`${type.charAt(0).toUpperCase() + type.slice(1)} completed successfully!`);
         setShowSuccessToast(true);
         setTimeout(() => setShowSuccessToast(false), 3000);
@@ -160,11 +180,11 @@ const Dashboard: React.FC = () => {
     } catch (error) {
       console.error('Action failed:', error);
       
-      // Only show fallback error if AI is genuinely not working
-      if (aiStatusMonitor.shouldShowFallbackError()) {
+      if (provider === 'mistral') {
+        setOutputText('Sorry, I couldn\'t process that text. Please try again with different content.');
+      } else if (aiStatusMonitor.shouldShowFallbackError()) {
         setOutputText(aiStatusMonitor.getUserFriendlyMessage());
       } else {
-        // AI is working but this specific request failed
         setOutputText('Sorry, I couldn\'t process that text. Please try again with different content.');
       }
     } finally {
@@ -294,20 +314,54 @@ const Dashboard: React.FC = () => {
                 FocusMate
               </motion.span>
             </motion.div>
+            {/* AI Provider Toggle */}
+            <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+              <button
+                onClick={() => provider !== 'chrome' && toggleProvider()}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  provider === 'chrome'
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                }`}
+                title="Chrome AI (On-Device)"
+              >
+                Chrome AI
+              </button>
+              <button
+                onClick={() => provider !== 'mistral' && toggleProvider()}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  provider === 'mistral'
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                }`}
+                title="Mistral AI (Cloud)"
+              >
+                Mistral AI
+              </button>
+            </div>
+
             {/* AI Status Indicator */}
             <div className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium ${
-              aiStatusMonitor.isReadyForUse()
-                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+              provider === 'chrome' 
+                ? (aiStatusMonitor.isReadyForUse()
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200')
+                : (isMistralAIConfigured()
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200')
             }`}>
               <div className={`w-2 h-2 rounded-full mr-2 ${
-                aiStatusMonitor.isReadyForUse() ? 'bg-green-500' : 'bg-yellow-500'
+                provider === 'chrome'
+                  ? (aiStatusMonitor.isReadyForUse() ? 'bg-green-500' : 'bg-yellow-500')
+                  : (isMistralAIConfigured() ? 'bg-green-500' : 'bg-yellow-500')
               }`}></div>
-              {aiStatusMonitor.isReadyForUse()
-                ? 'AI Ready'
-                : aiStatus.isAvailable
-                  ? 'AI Limited'
-                  : 'AI Unavailable'}
+              {provider === 'chrome'
+                ? (aiStatusMonitor.isReadyForUse()
+                    ? 'AI Ready'
+                    : aiStatus.isAvailable
+                      ? 'AI Limited'
+                      : 'AI Unavailable')
+                : (isMistralAIConfigured() ? 'AI Ready' : 'API Key Needed')}
             </div>
           </div>
 
@@ -587,7 +641,7 @@ const Dashboard: React.FC = () => {
                           {activeAction ? `Processing ${activeAction}...` : 'Processing...'}
                         </p>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                          Using Chrome AI
+                          Using {provider === 'chrome' ? 'Chrome AI' : 'Mistral AI'}
                         </p>
                       </div>
                     </div>
